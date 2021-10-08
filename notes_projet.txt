@@ -1,1 +1,3 @@
 hexdump -C test.pcap
+
+revenir sur ethernet et voir quels ethertype parser

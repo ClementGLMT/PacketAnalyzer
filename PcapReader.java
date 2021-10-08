@@ -133,6 +133,6 @@ public class PcapReader {
   private String parsePacketData(int packetLength){
 
     // System.out.println(String.join("", Arrays.copyOfRange(this.hexBuff, fileCursor, fileCursor+= packetLength)));
-    return String.join(" ", Arrays.copyOfRange(this.hexBuff, fileCursor, fileCursor+= packetLength));
+    return String.join("", Arrays.copyOfRange(this.hexBuff, fileCursor, fileCursor+= packetLength));
   }
 }

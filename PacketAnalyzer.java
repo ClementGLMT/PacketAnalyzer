@@ -16,5 +16,7 @@ public class PacketAnalyzer {
         for (Packet packet : packetList) {
             System.out.println(packet);
         }
+        ProtocolParser pparser = new ProtocolParser(packetList.get(0).getPacketData());
+        System.out.println(pparser.recognizeARP());
     }
 }
