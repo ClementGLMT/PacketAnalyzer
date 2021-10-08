@@ -1,0 +1,46 @@
+JAVA :( (spécifier la version)
+
+Analyseur pcap 
+aucune lib externe
+pas d'interface graphique
+
+
+reconstruire flux tcp
+indépendance des couches
+
+pas faire par port -> vérifier la partie applicative
+
+si proto pas demandé -> "protocole non géré" -> dump hexa du paquet
+
+Afficher les infos pertinentes du protocole
+
+Faire un readme
+
+librairies de  base de java : io, lang, util
+
+1. Comprendre format pcap avec doc wireshark
+https://wiki.wireshark.org/Development/LibpcapFileFormat 
+
+PROTOCOLES A IMPLEMENTER
+
+	Ethernet
+	ARP
+
+	IPv4 (IPv6 Bonus)
+	ICMP
+	TCP -> Follow TCP stream
+	UDP
+
+	DNS
+	DHCP
+
+	HTTP
+	FTP (passif)
+
+Readme d'utilisation
+rendre les .java
+
+hexdump
+
+
+
