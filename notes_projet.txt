@@ -1,3 +1,18 @@
 hexdump -C test.pcap
 
 revenir sur ethernet et voir quels ethertype parser
+
+icmp +ipv4 + ethernet
+
+tcp + ipv4 + ethernet
+
+arp + ethernet
+
+ethernet + ipv4 + tcp / udp + dns
+
+ethernet + ipv4 + tcp / udp + dhcp
+
+ethernet + ipv4 + tcp / udp + http
+
+ethernet + ipv4 + tcp / udp + ftp 
+  

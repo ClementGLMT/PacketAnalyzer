@@ -1,4 +1,3 @@
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,44 +9,34 @@ public class ProtocolParser {
         this.packetData = packetData;
     }
 
-    public boolean recognizeARP(){
+    public EthernetData recognizeEthernet(){
         String arpPattern = "([0-9a-fA-F]{12})([0-9a-fA-F]{12})(8100[0-9a-fA-F]{4})?(0800|0806|809b|80F3|86DD)";
-        String pat = "(.*)";
 
-        // Pattern r = Pattern.compile(arpPattern);
-        Pattern r = Pattern.compile(pat);
+
+        Pattern r = Pattern.compile(arpPattern);
 
         Matcher m = r.matcher(packetData);
 
-        System.out.println("\n"+packetData);
-        System.out.println(m.results().count());
+        boolean result = m.find();
 
-        MatchResult res = m.toMatchResult();
-        System.out.println(res);
-        int i = 0;
-        while (m.find()) {
-            for (int j = 0; j <= m.groupCount(); j++) {
-                System.out.println("------------------------------------");
-                System.out.println("Group " + i + ": " + m.group(j));
-                i++;
-             }
+        if(result){
+            EthernetData data = new EthernetData(m.group(1), m.group(2), m.group(3), m.group(4), resolveEtherType(m.group(4)));
+            return data;
+        } else {
+            return new EthernetData();
         }
+    }
 
-        System.out.println(m.results());
-        System.out.println(m.group(0));
-        System.out.println(m.group(1));
-        System.out.println(m.group(2));
-        System.out.println(m.group(3));
-        System.out.println(m.group(4));
-
-        if(m.results().count() == 4){
-            System.out.println(m.group(0));
-            System.out.println(m.group(1));
-            System.out.println(m.group(2));
-            System.out.println(m.group(3));
-            System.out.println(m.group(4));
-            return true;
+    private String resolveEtherType(String etherType){
+        switch (etherType) {
+            case "0800":
+                return "IPv4";
+            case "0806":
+                return "ARP";
+            case "86dd":
+                return "IPv6";
+            default:
+                return "Unknown";
         }
-        return false;
     }
 }

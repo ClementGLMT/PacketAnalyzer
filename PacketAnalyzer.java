@@ -3,8 +3,9 @@ import java.util.Map;
 
 public class PacketAnalyzer {
     public static void main(String[] args){
+        int i;
 
-        PcapReader pcapReader = new PcapReader("capture.pcap");
+        PcapReader pcapReader = new PcapReader("capture-arp.pcap");
 
         Map<String, Object> headers = pcapReader.getFileHeaders();
 
@@ -13,10 +14,12 @@ public class PacketAnalyzer {
         System.out.println("File headers\n");
         System.out.println(headers+"\n");
 
-        for (Packet packet : packetList) {
-            System.out.println(packet);
+        for (i=0; i < packetList.size(); i++) {
+            System.out.println("\n------------Packet "+i+"------------");
+            System.out.println("Packet Data :\n"+packetList.get(i).getPacketData());
+            ProtocolParser pparser = new ProtocolParser(packetList.get(i).getPacketData());
+            System.out.println(pparser.recognizeEthernet());
         }
-        ProtocolParser pparser = new ProtocolParser(packetList.get(0).getPacketData());
-        System.out.println(pparser.recognizeARP());
+
     }
 }
