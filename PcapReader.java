@@ -87,7 +87,17 @@ public class PcapReader {
       headers.put("thiszone", reverseHexWord(new String[] {hexBuff[8], hexBuff[9], hexBuff[10], hexBuff[11]}));
       headers.put("sigfigs", reverseHexWord(new String[] {hexBuff[12], hexBuff[13], hexBuff[14], hexBuff[15]}));
       headers.put("snaplen", Integer.parseInt(reverseHexWord(new String[] {hexBuff[16], hexBuff[17], hexBuff[18], hexBuff[19]}), 16));
-      headers.put("network", reverseHexWord(new String[] {hexBuff[20], hexBuff[21], hexBuff[22], hexBuff[23]}));
+      headers.put("network", reverseHexWord(new String[] {hexBuff[20], hexBuff[21], hexBuff[22], hexBuff[23]}).substring(4));
+      
+      switch ((String )headers.get("network")) {
+        case "0001":
+          headers.put("networkLength", "06");
+          break;
+      
+        default:
+          headers.put("networkLength", "00");
+          break;
+      }
 
       // WTF pq ma machine lit en big endian
       System.out.println("snaplen : "+"0x"+String.join("", new String[] {hexBuff[16], hexBuff[17], hexBuff[18], hexBuff[19]}));

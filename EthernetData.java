@@ -38,7 +38,7 @@ public class EthernetData {
     }
 
     public String toString(){
-        return "------ETHERNET------\nSource MAC @ : "+sourceMacAddress+"\nDestination MAC @ : "+destMacAddress+"\nEtherType : "+etherTypeHuman+" ("+etherTypeHuman+")";
+        return "------ETHERNET------\nSource MAC @ : "+sourceMacAddress+"\nDestination MAC @ : "+destMacAddress+"\nEtherType : "+etherType+" ("+etherTypeHuman+")";
     }
     
 }

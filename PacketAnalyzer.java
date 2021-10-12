@@ -5,7 +5,7 @@ public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
 
-        PcapReader pcapReader = new PcapReader("capture-arp.pcap");
+        PcapReader pcapReader = new PcapReader("arp.pcap");
 
         Map<String, Object> headers = pcapReader.getFileHeaders();
 
@@ -18,8 +18,9 @@ public class PacketAnalyzer {
             System.out.println("\n------------Packet "+i+"------------");
             System.out.println("Packet Data :\n"+packetList.get(i).getPacketData());
             ProtocolParser pparser = new ProtocolParser(packetList.get(i).getPacketData());
+            
             System.out.println(pparser.recognizeEthernet());
+            System.out.println(pparser.recognizeArp(headers));
         }
-
     }
 }
