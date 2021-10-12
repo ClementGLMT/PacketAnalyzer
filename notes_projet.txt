@@ -21,4 +21,6 @@ ARP :
 
 http://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml
 
+Mettre headers dans ethernet - IP à la place de "data"
+
   

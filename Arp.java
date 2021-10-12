@@ -1,4 +1,4 @@
-public class ArpData {
+public class Arp {
 
     private String ptype;
     private String ptypeHuman;
@@ -8,8 +8,10 @@ public class ArpData {
     private String senderProtocolAddress;
     private String targetHardwareAdress;
     private String targetProtocolAddress;
+    private boolean isMatched;
+    private String arpHeaders;
 
-    public ArpData(String ptype, String ptypeHuman, String plen, String opcode, String senderHardwareAdress, String senderProtocolAddress, String targetHardwareAdress, String targetProtocolAddress){
+    public Arp(String ptype, String ptypeHuman, String plen, String opcode, String senderHardwareAdress, String senderProtocolAddress, String targetHardwareAdress, String targetProtocolAddress, String arpHeaders){
         this.ptype = ptype;
         this.ptypeHuman = ptypeHuman;
         this.plen = plen;
@@ -18,9 +20,11 @@ public class ArpData {
         this.senderProtocolAddress = senderProtocolAddress;
         this.targetHardwareAdress = targetHardwareAdress;
         this.targetProtocolAddress = targetProtocolAddress;
+        this.isMatched = true;
+        this.arpHeaders = arpHeaders;
     }  
 
-    public ArpData(){
+    public Arp(){
         this.ptype = "";
         this.ptypeHuman = "";
         this.plen = "";
@@ -29,6 +33,8 @@ public class ArpData {
         this.senderProtocolAddress = "";
         this.targetHardwareAdress = "";
         this.targetProtocolAddress = "";
+        this.isMatched = false;
+        this.arpHeaders = "";
     }
 
     private String resolveOpCode(){
@@ -41,6 +47,14 @@ public class ArpData {
             default:
                 return "";
         }
+    }
+
+    public boolean getIsMatched(){
+        return isMatched;
+    }
+
+    public String getArpHeaders(){
+        return arpHeaders;
     }
 
     public String toString(){
