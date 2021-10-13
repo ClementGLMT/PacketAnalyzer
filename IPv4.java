@@ -1,6 +1,7 @@
 public class IPv4 {
 
     private int headerLength;
+    private int headerLengthBytes;
     private String ds;
     private int totalLength;
     private String identification;
@@ -17,6 +18,7 @@ public class IPv4 {
     public IPv4(int headerLength, String ds, int totalLength, String identification,String flags,String fragmentOffset,String ttl,String protocol,String headerChecksum,String sourceAdress,String destinationAdress, String ipv4Headers){
         
         this.headerLength = headerLength;
+        this.headerLengthBytes = headerLength*4;
         this.ds = ds;
         this.totalLength = totalLength;
         this.identification = identification;
@@ -49,7 +51,7 @@ public class IPv4 {
     }
 
     public String toString(){
-        return "------IPv4------\nHeader Length : "+headerLength+"\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress;
+        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress;
     }
 
     public boolean getIsMatched(){
@@ -73,7 +75,19 @@ public class IPv4 {
         }
     }
 
+    public int getHeaderLength(){
+        return headerLength;
+    }
+
+    public int getTotalLength(){
+        return totalLength;
+    }
+
     public String getTransportProtocol(){
         return protocol;
+    }
+
+    public int getHeaderLengthBytes(){
+        return headerLengthBytes;
     }
 }

@@ -89,7 +89,7 @@ public class PcapReader {
       headers.put("snaplen", Integer.parseInt(reverseHexWord(new String[] {hexBuff[16], hexBuff[17], hexBuff[18], hexBuff[19]}), 16));
       headers.put("network", reverseHexWord(new String[] {hexBuff[20], hexBuff[21], hexBuff[22], hexBuff[23]}).substring(4));
       
-      switch ((String )headers.get("network")) {
+      switch ((String) headers.get("network")) {
         case "0001":
           headers.put("networkLength", "06");
           break;

@@ -23,4 +23,9 @@ http://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml
 
 Mettre headers dans ethernet - IP à la place de "data"
 
+DNS -> implémenter A, NS, MX
+
+définition flux tcp -> numéros de séquence - ports
+	mais on peut se servir de l'ip si c'est plus simple
+
   
