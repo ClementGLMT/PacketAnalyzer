@@ -1,7 +1,5 @@
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.util.Map;
 
 
@@ -104,6 +102,9 @@ public class ProtocolParser {
     }
 
     // public static Tcp recognizeTcp(String packetData){
+
+        // ([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})(?:[0-9a-fA-F]{1})0([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})
+        // Dernier groupe capturé = checksum
 
     //     int DO = Integer.parseInt(packetData.substring(12,15), 16);
 
