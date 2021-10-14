@@ -101,16 +101,27 @@ public class ProtocolParser {
 
     }
 
-    // public static Tcp recognizeTcp(String packetData){
+    public static Tcp recognizeTcp(String packetData, int DO){
 
-        // ([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})(?:[0-9a-fA-F]{1})0([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})
-        // Dernier groupe capturé = checksum
+        String tcpHeaders = packetData.substring(0, DO*8);
 
-    //     int DO = Integer.parseInt(packetData.substring(12,15), 16);
+        String tcpPattern = "([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})(?:[0-9a-fA-F]{1})0([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{0,40})";
 
-    //     System.out.println(DO);
+        Pattern r = Pattern.compile(tcpPattern);
 
-    // }
+        Matcher m = r.matcher(tcpHeaders);
+
+        boolean result = m.find();
+
+        if(result){
+
+            Tcp tcp = new Tcp(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Long.parseLong(m.group(3), 16), Long.parseLong(m.group(4), 16), DO, m.group(5), m.group(6), m.group(7), m.group(8), m.group(9), packetData.substring(DO*8), tcpHeaders);
+            return tcp;
+
+        } else {
+            return new Tcp();
+        }
+    }
 
     public static String ipv4HexaToHuman(String ipv4Hexa){
         int i;

@@ -6,7 +6,7 @@ import java.util.Map;
 public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
-        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0;
+        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0;
 
         PcapReader pcapReader = new PcapReader("tcp.pcap");
 
@@ -53,6 +53,7 @@ public class PacketAnalyzer {
                         case "IPv4":
 
                             // Trying to recognize IPv4
+                            // @todo gérer les options ipv4
                             IPv4 ipv4 = ProtocolParser.recognizeIPv4(currentPacket);
 
                             // If IPv4 is recognized
@@ -76,12 +77,23 @@ public class PacketAnalyzer {
                                 switch (ipv4.resolveTransportProtocol()) {
                                     case "TCP":
 
-                                        // Tcp tcp = ProtocolParser.recognizeTcp(currentPacket);
+                                        // Retrieving TCP header length
                                         int DO = Integer.parseInt((String.valueOf(currentPacket.charAt(24))) , 16);
 
-                                        System.out.println("TCP Header Length String: "+currentPacket.charAt(12));
+                                        Tcp tcp = ProtocolParser.recognizeTcp(currentPacket, DO);
 
-                                        System.out.println("TCP Header Length : "+DO);
+                                        if(tcp.getIsMatched()){
+
+                                            tcpC++;
+
+                                            System.out.println(tcp);
+
+                                            currentPacket = tcp.getPayload();
+
+                                            System.out.println("TCP Headers : "+tcp.getHeaders());
+                                            System.out.println("TCP payload : "+tcp.getPayload());
+
+                                        }
 
                                         break;
 
@@ -151,6 +163,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC);
     }
 }
