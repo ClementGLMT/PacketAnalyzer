@@ -6,7 +6,7 @@ import java.util.Map;
 public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
-        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0;
+        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0;
 
         PcapReader pcapReader = new PcapReader("tcp.pcap");
 
@@ -52,9 +52,11 @@ public class PacketAnalyzer {
                         // Case IPv4 as Layer 3 protocol
                         case "IPv4":
 
+                            int ipv4headerLength = Integer.parseInt((String.valueOf(currentPacket.charAt(1))) , 16);
+
                             // Trying to recognize IPv4
                             // @todo gérer les options ipv4
-                            IPv4 ipv4 = ProtocolParser.recognizeIPv4(currentPacket);
+                            IPv4 ipv4 = ProtocolParser.recognizeIPv4(currentPacket, ipv4headerLength);
 
                             // If IPv4 is recognized
                             if(ipv4.getIsMatched()){
@@ -65,12 +67,12 @@ public class PacketAnalyzer {
                                 System.out.println(ipv4);
                                 // System.out.println("IPV4 Headers : "+ipv4.getIpv4Headers());
 
-                                int ipv4PayloadSize = ipv4.getTotalLength()-(ipv4.getHeaderLengthBytes());
+                                int ipv4PayloadSize = (ipv4.getHeaderLengthBytes());
 
                                 System.out.println("Payload ipv4 Size : "+ipv4PayloadSize);
 
                                 // Decapsulation from IPv4
-                                currentPacket = currentPacket.substring(ipv4.getIpv4Headers().length());
+                                currentPacket = currentPacket.substring(ipv4.getHeaderLengthBytes()*2);
                                 System.out.println("Depiled packet : "+currentPacket);
 
                                 // IPv4 Headers gives us the Layer 4 protocol used
@@ -108,6 +110,19 @@ public class PacketAnalyzer {
                                             System.out.println(udp);
                                             System.out.println("UDP Headers : "+udp.getUdpHeaders());
                                             System.out.println("UDP Data : "+udp.getUdpData());
+
+                                            if(udp.getDestPort() == 53 ||  udp.getSourcePort() == 53){
+
+                                                Dns dns = ProtocolParser.recognizeDns(udp.getUdpData());
+
+                                                if(dns.getIsMatched()){
+
+                                                    dnsC++;
+                                                    System.out.println(dns);
+                                                    System.out.println("DNS data : "+dns.getDnsData());
+                                                    dns.parseDnsData();
+                                                }
+                                            }
 
                                         }
 
@@ -163,6 +178,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC);
     }
 }

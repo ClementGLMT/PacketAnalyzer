@@ -6,6 +6,14 @@ public class Tcp {
     private long acknowlegmentNumber;
     private int headerLength;
     private String flags;
+    private int CWR;
+    private int ECN;
+    private int urgent;
+    private int ack;
+    private int push;
+    private int reset;
+    private int syn;
+    private int fin;
     private String window;
     private String checksum;
     private String urgentPointer;
@@ -21,7 +29,8 @@ public class Tcp {
         this.sequenceNumber = sequenceNumber;
         this.acknowlegmentNumber = acknowlegmentNumber;
         this.headerLength = headerLength;
-        this.flags = flags;
+        this.flags = ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(flags, 16)), 8);
+        resolveFlags(this.flags);
         this.window = window;
         this.checksum = checksum;
         this.urgentPointer = urgentPointer;
@@ -81,8 +90,81 @@ public class Tcp {
         return headers;
     }
 
+    public int getCWR(){
+        return CWR;
+    }
+
+    public int getECN(){
+        return ECN;
+    }
+    public int getUrgent(){
+        return urgent;
+    }
+    public int getAck(){
+        return ack;
+    }
+    public int getPush(){
+        return push;
+    }
+    public int getReset(){
+        return reset;
+    }
+    public int getSyn(){
+        return syn;
+    }
+    public int getFin(){
+        return fin;
+    }
+
+
+
+    private void resolveFlags(String myFlags){
+
+       CWR = Character.getNumericValue(myFlags.charAt(0));
+       ECN = Character.getNumericValue(myFlags.charAt(1));
+       urgent = Character.getNumericValue(myFlags.charAt(2));
+       ack = Character.getNumericValue(myFlags.charAt(3));
+       push = Character.getNumericValue(myFlags.charAt(4));
+       reset = Character.getNumericValue(myFlags.charAt(5));
+       syn = Character.getNumericValue(myFlags.charAt(6));
+       fin = Character.getNumericValue(myFlags.charAt(7));
+
+    }
+
+    private String flagsToString(){
+        String fl = "";
+
+        if(CWR == 1){
+            fl += "[Congestion Window Reduced]  ";
+        }
+        if(ECN == 1){
+            fl += "[ECN-Echo]  ";
+        }
+        if(urgent == 1){
+            fl += "[Urgent]  ";
+        }
+        if(ack == 1){
+            fl += "[Acknowledgment]  ";
+        }
+        if(push == 1){
+            fl += "[Push]  ";
+        }
+        if(reset == 1){
+            fl += "[Reset]  ";
+        }
+        if(syn == 1){
+            fl += "[Syn]  ";
+        }
+        if(fin == 1){
+            fl += "[Fin]  ";
+        }
+
+        return fl;
+
+    }
+
     public String toString(){
-        return "------TCP------\nSource port : "+sourcePort+"\nDestination port : "+destinationPort+"\nSequence number : "+sequenceNumber+"\nAcknowledgment number : "+acknowlegmentNumber+"\nHeader length : "+headerLength+" ("+getHeaderLengthBytes()+")\nFlags : "+flags+"\nWindow : "+window+"\nChecksum : "+checksum+"\nUrgent Pointer : "+urgentPointer+"\nOptions : "+options;
+        return "------TCP------\nSource port : "+sourcePort+"\nDestination port : "+destinationPort+"\nSequence number : "+sequenceNumber+"\nAcknowledgment number : "+acknowlegmentNumber+"\nHeader length : "+headerLength+" ("+getHeaderLengthBytes()+")\nFlags : "+flags+" "+flagsToString()+"\nWindow : "+window+"\nChecksum : "+checksum+"\nUrgent Pointer : "+urgentPointer+"\nOptions : "+options;
     }
     
 }

@@ -12,10 +12,11 @@ public class IPv4 {
     private String headerChecksum;
     private String sourceAdress;
     private String destinationAdress;
+    private String options;
     private String ipv4Headers;
     private boolean isMatched;
 
-    public IPv4(int headerLength, String ds, int totalLength, String identification,String flags,String fragmentOffset,String ttl,String protocol,String headerChecksum,String sourceAdress,String destinationAdress, String ipv4Headers){
+    public IPv4(int headerLength, String ds, int totalLength, String identification,String flags,String fragmentOffset,String ttl,String protocol,String headerChecksum,String sourceAdress,String destinationAdress, String options , String ipv4Headers){
         
         this.headerLength = headerLength;
         this.headerLengthBytes = headerLength*4;
@@ -29,6 +30,7 @@ public class IPv4 {
         this.headerChecksum = headerChecksum;
         this.sourceAdress = sourceAdress;
         this.destinationAdress = destinationAdress;
+        this.options = options;
         this.ipv4Headers = ipv4Headers;
         this.isMatched = true;
     }
@@ -51,7 +53,7 @@ public class IPv4 {
     }
 
     public String toString(){
-        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress;
+        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 
     public boolean getIsMatched(){

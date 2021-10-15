@@ -39,17 +39,21 @@ public class ProtocolParser {
         }
     }
 
-    public static IPv4 recognizeIPv4(String packetData){
-        String ipv4Pattern = "4([5-9a-fA-F])([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})";
+    public static IPv4 recognizeIPv4(String packetData, int length){
+        String ipv4Pattern = "4([5-9a-fA-F])([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{0,40})";
+
+        // @todo debug options;
+
+        String ipv4Headers = packetData.substring(0, length*8);
 
         Pattern r = Pattern.compile(ipv4Pattern);
 
-        Matcher m = r.matcher(packetData);
+        Matcher m = r.matcher(ipv4Headers);
 
         boolean result = m.find();
 
         if(result){
-            IPv4 data = new IPv4(Integer.parseInt(m.group(1), 16) , m.group(2), Integer.parseInt(m.group(3), 16) , m.group(4), m.group(5), m.group(5), m.group(6), m.group(7), m.group(8), ipv4HexaToHuman(m.group(9)), ipv4HexaToHuman(m.group(10)), m.group(0));
+            IPv4 data = new IPv4(Integer.parseInt(m.group(1), 16) , m.group(2), Integer.parseInt(m.group(3), 16) , m.group(4), m.group(5), m.group(5), m.group(6), m.group(7), m.group(8), ipv4HexaToHuman(m.group(9)), ipv4HexaToHuman(m.group(10)), m.group(11), m.group(0));
             return data;
         } else {
             return new IPv4();
@@ -123,6 +127,31 @@ public class ProtocolParser {
         }
     }
 
+    public static Dns recognizeDns(String packetData){
+
+        String dnsHeaders = packetData.substring(0, 24);
+        
+        String dnsData = packetData.substring(24);
+
+        String dnsPattern = "([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})";
+        
+        Pattern r = Pattern.compile(dnsPattern);
+
+        Matcher m = r.matcher(dnsHeaders);
+
+        boolean result = m.find();
+
+        if(result){
+
+            Dns dns = new Dns(m.group(1), Integer.parseInt(m.group(2), 16), m.group(3), m.group(4), m.group(5), m.group(6), dnsData);
+            return dns;
+
+        } else {
+            return new Dns();
+        }
+
+    }
+
     public static String ipv4HexaToHuman(String ipv4Hexa){
         int i;
         String ipv4="";
@@ -143,5 +172,13 @@ public class ProtocolParser {
             default:
                 return "Unknown";
         }
+    }
+
+    public static String addFlagsPadding(String s, int nb){
+        int c = nb - s.length();
+        for(int i=0; i<c; i++){
+            s = "0"+s;
+        }
+        return s;
     }
 }

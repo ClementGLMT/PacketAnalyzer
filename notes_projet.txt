@@ -27,5 +27,7 @@ DNS -> implémenter A, NS, MX
 
 définition flux tcp -> numéros de séquence - ports
 	mais on peut se servir de l'ip si c'est plus simple
+	
+fragmentation IP
 
   

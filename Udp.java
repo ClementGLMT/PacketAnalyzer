@@ -44,5 +44,13 @@ public class Udp {
     public String getUdpData(){
         return udpData;
     }
+
+    public int getDestPort(){
+        return destinationPort;
+    }
+
+    public int getSourcePort(){
+        return sourcePort;
+    }
     
 }
