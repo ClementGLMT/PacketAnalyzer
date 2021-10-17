@@ -181,4 +181,14 @@ public class ProtocolParser {
         }
         return s;
     }
+
+    public static String domainHexaToHuman(String hex){
+
+        StringBuilder output = new StringBuilder();
+        for (int k = 0; k < hex.length(); k+=2) {
+            String str = hex.substring(k, k+2);
+            output.append((char)Integer.parseInt(str, 16));
+        }
+        return output.toString();
+    }
 }
