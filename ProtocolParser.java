@@ -152,6 +152,42 @@ public class ProtocolParser {
 
     }
 
+    public static Ftp recognizeFtp(String packetDataAscii){
+
+        System.out.println("Packet data : "+packetDataAscii);
+
+        // Building regex for matching a command
+        String ftpCommands = "";
+        for (FtpCommands ftpcom : java.util.Arrays.asList(FtpCommands.values())) {
+            ftpCommands += ftpcom.toString()+"|";
+        }
+        String ftpPattern = "("+ftpCommands.substring(0, ftpCommands.length()-1)+"){1}([ -~]*)\r\n";
+
+        // Building a regex for matching a response
+        String ftpReplyCodes = "";
+        for (FtpResponseCodes ftpresp : java.util.Arrays.asList(FtpResponseCodes.values())) {
+            ftpReplyCodes += ftpresp.toString()+"|";
+        }
+        String ftpRespondeCodesPattern = "(("+ftpReplyCodes.substring(0, ftpReplyCodes.length()-1)+") ){1}([ -~]*)\r\n";
+
+        // Trying to match a command
+        Pattern r = Pattern.compile(ftpPattern);       
+        Matcher m = r.matcher(packetDataAscii);
+        boolean result = m.find();
+
+        // If a command is matched
+        if(result){
+            Ftp ftp = new Ftp(m.group(1), m.group(2))
+        } else {
+                       
+            // Trying to match response
+            r = Pattern.compile(ftpRespondeCodesPattern);
+            m = r.matcher(packetDataAscii);
+            result = m.find();
+        }
+
+    }
+
     public static String ipv4HexaToHuman(String ipv4Hexa){
         int i;
         String ipv4="";
@@ -182,7 +218,7 @@ public class ProtocolParser {
         return s;
     }
 
-    public static String domainHexaToHuman(String hex){
+    public static String HexaToAscii(String hex){
 
         StringBuilder output = new StringBuilder();
         for (int k = 0; k < hex.length(); k+=2) {

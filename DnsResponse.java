@@ -68,7 +68,7 @@ public class DnsResponse {
             case 5:
                 return "CNAME (Canonical NAME for an Alias)";
             default:
-                return "";
+                return "Type not supported";
         }
     }
 
@@ -81,7 +81,7 @@ public class DnsResponse {
             case 4:
                 return "HS (Hesiod)";
             default:
-                return "";
+                return "Class not supported";
         }
     } 
 

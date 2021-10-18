@@ -26,11 +26,12 @@ public class DnsQuery {
                 return "MX (Mail Exchange)";
             case 28:
                 return "AAAA (IPv6 Address)";
+            case 5:
+                return "CNAME (Canonical NAME for an Alias)";
             default:
-                return "";
+                return "Type not supported";
         }
     }
-
     public void setType(int type) {
         this.type = type;
     }

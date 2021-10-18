@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // javac PacketAnalyzer.java PcapReader.java ProtocolParser.java Packet.java Ethernet.java Arp.java IPv4.java && java PacketAnalyzer
 
@@ -8,7 +10,7 @@ public class PacketAnalyzer {
         int i;
         int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0;
 
-        PcapReader pcapReader = new PcapReader("tcp.pcap");
+        PcapReader pcapReader = new PcapReader("ftp.pcap");
 
         Map<String, Object> headers = pcapReader.getFileHeaders();
 
@@ -59,7 +61,11 @@ public class PacketAnalyzer {
                             IPv4 ipv4 = ProtocolParser.recognizeIPv4(currentPacket, ipv4headerLength);
 
                             // If IPv4 is recognized
-                            if(ipv4.getIsMatched()){
+                            if(ipv4.getIsMatched() && (ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)){
+
+                                // System.out.println("Dont fragment : "+ipv4.getDontFragment());
+                                // System.out.println("More fragment : "+ipv4.getMoreFragment());
+                                // System.out.println("Offset : "+ipv4.getIntFragmentOffset());
 
                                 // Increments counter 
                                 ipv4C ++;
@@ -69,7 +75,7 @@ public class PacketAnalyzer {
 
                                 int ipv4PayloadSize = (ipv4.getHeaderLengthBytes());
 
-                                System.out.println("Payload ipv4 Size : "+ipv4PayloadSize);
+                                // System.out.println("Payload ipv4 Size : "+ipv4PayloadSize);
 
                                 // Decapsulation from IPv4
                                 currentPacket = currentPacket.substring(ipv4.getHeaderLengthBytes()*2);
@@ -93,7 +99,44 @@ public class PacketAnalyzer {
                                             currentPacket = tcp.getPayload();
 
                                             System.out.println("TCP Headers : "+tcp.getHeaders());
-                                            System.out.println("TCP payload : "+tcp.getPayload());
+                                            System.out.println("TCP payload : "+ ProtocolParser.HexaToAscii(tcp.getPayload()));
+
+                                            // Ftp ftp = ProtocolParser.recognizeFtp(currentPacket);
+
+                                            String currentPacketAscii = ProtocolParser.HexaToAscii(tcp.getPayload());
+
+
+                                            System.out.println("Ftp pattern : "+ftpPattern);
+                                            
+                                            Pattern r = Pattern.compile(ftpPattern);
+                                    
+                                            Matcher m = r.matcher(currentPacketAscii);
+
+                                            System.out.println("Packet ascii : "+currentPacketAscii);
+                                    
+                                            boolean result = m.find();
+
+
+                                            System.out.println("Ftp pattern : "+ftpRespondeCodesPattern);
+                                            
+                                            Pattern r = Pattern.compile(ftpRespondeCodesPattern);
+                                    
+                                            Matcher m = r.matcher(currentPacketAscii);
+
+                                            System.out.println("Packet ascii : "+currentPacketAscii);
+                                    
+                                            boolean result = m.find();
+
+                                            if(result){
+                                                System.out.println("Matched");
+                                                System.out.println("Group 0 : "+m.group(0));
+                                                System.out.println("Group 1 : "+m.group(1));
+                                                System.out.println("Group 2 : "+m.group(2));
+                                                System.out.println("Group 3 : "+m.group(3));
+
+                                            }
+
+                                            System.out.println(ftpCommands);
 
                                         }
 
