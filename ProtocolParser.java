@@ -154,21 +154,25 @@ public class ProtocolParser {
 
     public static Ftp recognizeFtp(String packetDataAscii){
 
-        System.out.println("Packet data : "+packetDataAscii);
+        // System.out.println("Packet data : "+packetDataAscii);
+        // System.out.println("Packet data length : "+packetDataAscii.length());
+
 
         // Building regex for matching a command
         String ftpCommands = "";
         for (FtpCommands ftpcom : java.util.Arrays.asList(FtpCommands.values())) {
             ftpCommands += ftpcom.toString()+"|";
         }
-        String ftpPattern = "("+ftpCommands.substring(0, ftpCommands.length()-1)+"){1}([ -~]*)\r\n";
+        String ftpPattern = "^("+ftpCommands.substring(0, ftpCommands.length()-1)+") ?([ -~]*)?\r\n";
+
+        System.out.println(ftpPattern);
 
         // Building a regex for matching a response
         String ftpReplyCodes = "";
         for (FtpResponseCodes ftpresp : java.util.Arrays.asList(FtpResponseCodes.values())) {
             ftpReplyCodes += ftpresp.toString()+"|";
         }
-        String ftpRespondeCodesPattern = "(("+ftpReplyCodes.substring(0, ftpReplyCodes.length()-1)+") ){1}([ -~]*)\r\n";
+        String ftpRespondeCodesPattern = "(("+ftpReplyCodes.substring(0, ftpReplyCodes.length()-1)+")[- ]?)([ -~]*)\r\n";
 
         // Trying to match a command
         Pattern r = Pattern.compile(ftpPattern);       
@@ -177,14 +181,26 @@ public class ProtocolParser {
 
         // If a command is matched
         if(result){
-            Ftp ftp = new Ftp(m.group(1), m.group(2))
+            // System.out.println("Command match");
+            Ftp ftpCom = new Ftp(m.group(1), m.group(2), 0);
+            return ftpCom;
         } else {
                        
             // Trying to match response
             r = Pattern.compile(ftpRespondeCodesPattern);
             m = r.matcher(packetDataAscii);
             result = m.find();
+
+            if(result){
+                // System.out.println("Group 1 : "+m.group(1));
+                // System.out.println("Group 2 : "+m.group(2));
+                // System.out.println("Group 2 : "+m.group(3));
+
+                Ftp ftpResp = new Ftp("", m.group(3),Integer.parseInt(m.group(1).substring(0, m.group(1).length()-1)));
+                return ftpResp;
+            }
         }
+        return new Ftp();
 
     }
 

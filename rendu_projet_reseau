@@ -1,0 +1,20 @@
+Projet Réseau :
+	- Envoi par mail : 02/11/2021
+	- Heure : 20h dernier délai
+	- damien.gros@cea.fr
+	- Sujet : [MSSIS] Projet Réseau
+	- faire un zip : (mettre un mot de passe au besoin et mettre le mdp dans le mail)
+		- source code .java
+		- pcap d'exemple
+		- README :
+			- explication du fonctionnement
+			- explication des choix "faits"
+			- exemple d'utilisation
+	- Protocoles :
+		- Ethernet
+		- ARP
+		- IP, ICMP, Ip fragmentation
+		- UDP, TCP, Follow TCP Streams
+		- DHCP, DNS
+		- FTP
+		- HTTP

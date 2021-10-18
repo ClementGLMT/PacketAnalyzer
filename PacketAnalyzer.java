@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
-        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0;
+        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0;
 
         PcapReader pcapReader = new PcapReader("ftp.pcap");
 
@@ -79,7 +79,7 @@ public class PacketAnalyzer {
 
                                 // Decapsulation from IPv4
                                 currentPacket = currentPacket.substring(ipv4.getHeaderLengthBytes()*2);
-                                System.out.println("Depiled packet : "+currentPacket);
+                                // System.out.println("Depiled packet : "+currentPacket);
 
                                 // IPv4 Headers gives us the Layer 4 protocol used
                                 switch (ipv4.resolveTransportProtocol()) {
@@ -98,46 +98,25 @@ public class PacketAnalyzer {
 
                                             currentPacket = tcp.getPayload();
 
-                                            System.out.println("TCP Headers : "+tcp.getHeaders());
-                                            System.out.println("TCP payload : "+ ProtocolParser.HexaToAscii(tcp.getPayload()));
+                                            // System.out.println("TCP Headers : "+tcp.getHeaders());
+                                            // System.out.println("TCP payload : "+ ProtocolParser.HexaToAscii(tcp.getPayload()));
 
                                             // Ftp ftp = ProtocolParser.recognizeFtp(currentPacket);
 
                                             String currentPacketAscii = ProtocolParser.HexaToAscii(tcp.getPayload());
 
+                                            Ftp ftp = ProtocolParser.recognizeFtp(currentPacketAscii);
 
-                                            System.out.println("Ftp pattern : "+ftpPattern);
-                                            
-                                            Pattern r = Pattern.compile(ftpPattern);
-                                    
-                                            Matcher m = r.matcher(currentPacketAscii);
+                                            if(ftp.getIsMatched()){
 
-                                            System.out.println("Packet ascii : "+currentPacketAscii);
-                                    
-                                            boolean result = m.find();
+                                                if(ftp.getResponseCode() == 227){
+                                                    // Regex : "Entering Passive Mode \([0-9]{1,3},[0-9]{1,3},[0-9]{1,3},[0-9]{1,3},([0-9]{1,4}),([0-9]{1,4})\)""
+                                                }
 
+                                                ftpC++;
 
-                                            System.out.println("Ftp pattern : "+ftpRespondeCodesPattern);
-                                            
-                                            Pattern r = Pattern.compile(ftpRespondeCodesPattern);
-                                    
-                                            Matcher m = r.matcher(currentPacketAscii);
-
-                                            System.out.println("Packet ascii : "+currentPacketAscii);
-                                    
-                                            boolean result = m.find();
-
-                                            if(result){
-                                                System.out.println("Matched");
-                                                System.out.println("Group 0 : "+m.group(0));
-                                                System.out.println("Group 1 : "+m.group(1));
-                                                System.out.println("Group 2 : "+m.group(2));
-                                                System.out.println("Group 3 : "+m.group(3));
-
+                                                System.out.println(ftp);
                                             }
-
-                                            System.out.println(ftpCommands);
-
                                         }
 
                                         break;
@@ -221,6 +200,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC);
     }
 }
