@@ -204,6 +204,41 @@ public class ProtocolParser {
 
     }
 
+    public static FtpData getFtpPassiveInfo(String ftpArgs, String ipClient){
+        String ftpPassive = "Entering Passive Mode "+"\\("+"([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,4}),([0-9]{1,4})\\)";
+        
+        Pattern r = Pattern.compile(ftpPassive);
+
+        Matcher m = r.matcher(ftpArgs);
+
+        boolean result = m.find();
+
+        if(result){
+            FtpData ftpData = new FtpData(m.group(1)+"."+m.group(2)+"."+m.group(3)+"."+m.group(4), Integer.parseInt(m.group(5))*256 + Integer.parseInt(m.group(6)), ipClient);
+            return ftpData;
+        } else {
+            return new FtpData();
+        }
+    }
+
+    public static Dhcp recognizeDhcp(String packetData){
+
+        String dhcpPattern = "^0([12])01([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{32})([0-9a-fA-F]{128})([0-9a-fA-F]{256})63825363([0-9a-fA-F]*)?";
+
+        Pattern r = Pattern.compile(dhcpPattern);
+
+        Matcher m = r.matcher(packetData);
+
+        boolean result = m.find();
+
+        if(result){
+            Dhcp dhcp = new Dhcp(Integer.parseInt(m.group(1), 16), 1, Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), m.group(4), Integer.parseInt(m.group(5), 16), m.group(6), ipv4HexaToHuman(m.group(7)), ipv4HexaToHuman(m.group(8)), ipv4HexaToHuman(m.group(9)), ipv4HexaToHuman(m.group(10)), m.group(11), m.group(12), m.group(13), m.group(14));
+            return dhcp;
+        } else {
+            return new Dhcp();
+        }
+    }
+
     public static String ipv4HexaToHuman(String ipv4Hexa){
         int i;
         String ipv4="";

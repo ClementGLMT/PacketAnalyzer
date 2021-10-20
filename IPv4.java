@@ -124,4 +124,12 @@ public class IPv4 {
     public int getHeaderLengthBytes(){
         return headerLengthBytes;
     }
+
+    public String getSourceAddress(){
+        return sourceAdress;
+    }
+
+    public String getDestinationAddress(){
+        return destinationAdress;
+    }
 }

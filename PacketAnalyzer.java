@@ -1,16 +1,14 @@
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-// javac PacketAnalyzer.java PcapReader.java ProtocolParser.java Packet.java Ethernet.java Arp.java IPv4.java && java PacketAnalyzer
+// javac *.java && java PacketAnalyzer
 
 public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
-        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0;
+        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0;
 
-        PcapReader pcapReader = new PcapReader("ftp.pcap");
+        PcapReader pcapReader = new PcapReader("dhcp.pcap");
 
         Map<String, Object> headers = pcapReader.getFileHeaders();
 
@@ -18,6 +16,9 @@ public class PacketAnalyzer {
 
         System.out.println("File headers\n");
         System.out.println(headers+"\n");
+
+        // Ftp Data is global when passive mode is turned on
+        FtpData ftpData = new FtpData();
 
         // For each packet in the file
         for (i=0; i < packetList.size(); i++) {
@@ -103,6 +104,15 @@ public class PacketAnalyzer {
 
                                             // Ftp ftp = ProtocolParser.recognizeFtp(currentPacket);
 
+                                            if(ftpData.isMatched()){
+                                                if((tcp.getSourcePort() == ftpData.getPort() || tcp.getSourcePort() == ftpData.getPort()) && !tcp.getPayload().equals("")){
+                                                    System.out.println(ftpData);
+
+                                                    ftpDataC++;
+
+                                                }
+                                            }
+
                                             String currentPacketAscii = ProtocolParser.HexaToAscii(tcp.getPayload());
 
                                             Ftp ftp = ProtocolParser.recognizeFtp(currentPacketAscii);
@@ -110,7 +120,8 @@ public class PacketAnalyzer {
                                             if(ftp.getIsMatched()){
 
                                                 if(ftp.getResponseCode() == 227){
-                                                    // Regex : "Entering Passive Mode \([0-9]{1,3},[0-9]{1,3},[0-9]{1,3},[0-9]{1,3},([0-9]{1,4}),([0-9]{1,4})\)""
+                                                    // Regex : "Entering Passive Mode \([0-9]{1,3},[0-9]{1,3},[0-9]{1,3},[0-9]{1,3},([0-9]{1,4}),([0-9]{1,4})\)"
+                                                    ftpData = ProtocolParser.getFtpPassiveInfo(currentPacketAscii, ipv4.getDestinationAddress());
                                                 }
 
                                                 ftpC++;
@@ -133,6 +144,18 @@ public class PacketAnalyzer {
                                             System.out.println("UDP Headers : "+udp.getUdpHeaders());
                                             System.out.println("UDP Data : "+udp.getUdpData());
 
+                                            // Trying to recognize DHCP
+                                            Dhcp dhcp = ProtocolParser.recognizeDhcp(udp.getUdpData());
+
+                                            if(dhcp.getIsMatched()){
+
+                                                dhcpC++;
+
+                                                System.out.println(dhcp);
+
+                                            }
+
+                                            // Trying to recognize DNS
                                             if(udp.getDestPort() == 53 ||  udp.getSourcePort() == 53){
 
                                                 Dns dns = ProtocolParser.recognizeDns(udp.getUdpData());
@@ -200,6 +223,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC);
     }
 }

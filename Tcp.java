@@ -115,8 +115,12 @@ public class Tcp {
     public int getFin(){
         return fin;
     }
-
-
+    public int getSourcePort(){
+        return sourcePort;
+    }
+    public int getDestinationPort(){
+        return destinationPort;
+    }
 
     private void resolveFlags(String myFlags){
 
