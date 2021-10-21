@@ -30,4 +30,23 @@ définition flux tcp -> numéros de séquence - ports
 	
 fragmentation IP
 
-  
+Options à parser DHCP :
+
+	Gateway (3)
+	Ip Forwarding (19)
+	Non local source routing(20)
+
+Discover:
+	Client identifier (67) ?
+	Requested IP (50) ?
+
+Request: 
+	Message type (53)
+	Hostname (12)
+
+ACK :
+	Subnet mask (1)
+	Domain name server (6)
+	Ip address lease time (51)
+
+

@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class Dhcp {
 
@@ -17,7 +19,7 @@ public class Dhcp {
     private String clientMac;
     private String serverHostName;
     private String bootFile;
-    private Dictionary<Integer, String> options;
+    private ArrayList<DhcpOption> options;
     private boolean isMatched;
 
     public Dhcp(int opcode, int htype, int hlen, int hops, String transacId, int secondElapsed, String flags,
@@ -29,7 +31,7 @@ public class Dhcp {
         this.hops = hops;
         this.transacId = transacId;
         this.secondElapsed = secondElapsed;
-        this.flags = flags;
+        this.flags = ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(flags.substring(0, 2), 16)), 16);
         this.clientIp = clientIp;
         this.yourClientIp = yourClientIp;
         this.nextServerIp = nextServerIp;
@@ -38,7 +40,8 @@ public class Dhcp {
         this.serverHostName = serverHostName;
         this.bootFile = bootFile;
         this.isMatched = true;
-        // this.options = options;
+        getBroadcastFlag(this.flags);
+        parseOptions(options);
     }
 
     public Dhcp() {
@@ -60,13 +63,30 @@ public class Dhcp {
         // this.options = options;
     }
 
-    private void parseOptions(String options){
+    private void parseOptions(String optionsString){
 
+        this.options = new ArrayList<DhcpOption>();
+
+        int localCursor = 0;
+
+        int optionCode;
+
+        // While option code is not 255 (end option)
+        while((optionCode = Integer.parseInt(optionsString.substring(localCursor, localCursor+=2),16)) != 255){
+            
+            // Put {optionCode, optionValue} in options dictionary
+            int optionLength = Integer.parseInt(optionsString.substring(localCursor, localCursor+=2),16);
+            String optionValue = optionsString.substring(localCursor, localCursor += optionLength*2);
+            options.add(new DhcpOption(optionCode, optionLength, optionValue));
+        }
+
+        options.add(new DhcpOption(255, 0, ""));
+        
     }
 
-    public int getBroadcastFlag(String flagss){
-        // ICI
-        ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(flags.substring(0, 2), 16)), 8)
+    public void getBroadcastFlag(String flagss){
+
+        this.broadcastFlag = Character.getNumericValue(flagss.charAt(0));
     }
 
     public boolean getIsMatched(){
@@ -85,7 +105,26 @@ public class Dhcp {
     }
 
     public String toString(){
-        return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+")\nHardware type : "+htype+"\nHarware Len : "+hlen+"\nHops : "+hops+"\nTransaction ID : "+transacId+"\nSecond elapsed : "+secondElapsed+"\nFlags : "+flags+"\nClient IP : "+clientIp+"\nYour Client IP : "+yourClientIp+"\nNext Server IP : "+nextServerIp+"\nGateway IP : "+gatewayIp+"\nClient MAC : "+clientMac+"\nServer Hostname : "+serverHostName+"\nBoot File : "+bootFile+"\nOptions : "+options;
+        String optionsString = "";
+        for (DhcpOption dhcpOption : options) {
+            optionsString += dhcpOption.toString();
+        }
+        return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
+        ")\nHardware type : "+htype+
+        "\nHarware Len : "+hlen+
+        "\nHops : "+hops+
+        "\nTransaction ID : "+transacId+
+        "\nSecond elapsed : "+secondElapsed+
+        "\nFlags : "+flags+
+        "\nBroadcast Flag : "+this.broadcastFlag+
+        "\nClient IP : "+clientIp+
+        "\nYour Client IP : "+yourClientIp+
+        "\nNext Server IP : "+nextServerIp+
+        "\nGateway IP : "+gatewayIp+
+        "\nClient MAC : "+clientMac+
+        "\nServer Hostname : "+serverHostName+
+        "\nBoot File : "+bootFile+
+        "\nOptions : "+optionsString;
     }
     
     
