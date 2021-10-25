@@ -37,7 +37,7 @@ Options à parser DHCP :
 	Non local source routing(20)
 
 Discover:
-	Client identifier (67) ?
+	Client identifier (61) ?
 	Requested IP (50) ?
 
 Request: 

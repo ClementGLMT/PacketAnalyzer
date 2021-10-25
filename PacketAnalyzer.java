@@ -8,7 +8,7 @@ public class PacketAnalyzer {
         int i;
         int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0;
 
-        PcapReader pcapReader = new PcapReader("dhcp.pcap");
+        PcapReader pcapReader = new PcapReader("tcp.pcap");
 
         Map<String, Object> headers = pcapReader.getFileHeaders();
 
@@ -99,10 +99,10 @@ public class PacketAnalyzer {
 
                                             currentPacket = tcp.getPayload();
 
-                                            // System.out.println("TCP Headers : "+tcp.getHeaders());
-                                            // System.out.println("TCP payload : "+ ProtocolParser.HexaToAscii(tcp.getPayload()));
+                                            System.out.println("TCP Payload : "+tcp.getPayload());
+                                            System.out.println("TCP Payload Ascii : \n"+ProtocolParser.hexaToAscii(tcp.getPayload()));
 
-                                            // Ftp ftp = ProtocolParser.recognizeFtp(currentPacket);
+                                            //Ajouter le parsing de http ici
 
                                             if(ftpData.isMatched()){
                                                 if((tcp.getSourcePort() == ftpData.getPort() || tcp.getSourcePort() == ftpData.getPort()) && !tcp.getPayload().equals("")){
@@ -113,7 +113,7 @@ public class PacketAnalyzer {
                                                 }
                                             }
 
-                                            String currentPacketAscii = ProtocolParser.HexaToAscii(tcp.getPayload());
+                                            String currentPacketAscii = ProtocolParser.hexaToAscii(tcp.getPayload());
 
                                             Ftp ftp = ProtocolParser.recognizeFtp(currentPacketAscii);
 

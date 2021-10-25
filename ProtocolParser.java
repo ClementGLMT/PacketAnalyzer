@@ -172,7 +172,7 @@ public class ProtocolParser {
         for (FtpResponseCodes ftpresp : java.util.Arrays.asList(FtpResponseCodes.values())) {
             ftpReplyCodes += ftpresp.toString()+"|";
         }
-        String ftpRespondeCodesPattern = "(("+ftpReplyCodes.substring(0, ftpReplyCodes.length()-1)+")[- ]?)([ -~]*)\r\n";
+        String ftpRespondeCodesPattern = "^(("+ftpReplyCodes.substring(0, ftpReplyCodes.length()-1)+")[- ]?)([ -~]*)\r\n";
 
         // Trying to match a command
         Pattern r = Pattern.compile(ftpPattern);       
@@ -239,6 +239,38 @@ public class ProtocolParser {
         }
     }
 
+    public static Http recognizeHttp(String packetData){
+
+        String http09and10Regex = "^(GET|OPTIONS|HEAD|POST|PUT|DELETE|TRACE|CONNECT) (((https?|http|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/)) HTTP/(?:[01]\\.[09])";
+        String http11Regex = "^(GET|OPTIONS|HEAD|POST|PUT|DELETE|TRACE|CONNECT) (((https?|http|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/)) HTTP/1\\.1\\r\\n([\\x20-\\x7E].*:[\\x20-\\x7E].*\\r\\n)*[hH][oO][sS][tT]:";
+
+        Pattern r = Pattern.compile(http11Regex);
+
+        Matcher m = r.matcher(packetData);
+
+        boolean result = m.find();
+
+        if(result){
+
+            Http http = new Http(m.group(1), m.group(2), m.group(0).substring(m.group(0).indexOf("\n")+1));
+            return http;
+
+        } else {
+            r = Pattern.compile(http09and10Regex);
+
+            m = r.matcher(packetData);
+    
+            result = m.find();
+
+            if(result){
+                Http http = new Http(m.group(1), m.group(2), m.group(0).substring(m.group(0).indexOf("\n")+1));
+                return http;
+            } else {
+                return new Http();
+            }
+        }
+    }
+
     public static String ipv4HexaToHuman(String ipv4Hexa){
         int i;
         String ipv4="";
@@ -269,7 +301,7 @@ public class ProtocolParser {
         return s;
     }
 
-    public static String HexaToAscii(String hex){
+    public static String hexaToAscii(String hex){
 
         StringBuilder output = new StringBuilder();
         for (int k = 0; k < hex.length(); k+=2) {

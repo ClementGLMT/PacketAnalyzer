@@ -248,7 +248,7 @@ public class Dns {
                 //     // }
                 // } else {
                 // System.out.println("intlen : "+intlen);
-                String domain = ProtocolParser.HexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
+                String domain = ProtocolParser.hexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
                 // System.out.println("Domain : "+domain);
                 word += domain + ".";
                 pointer += 2+intlen*2;
@@ -264,7 +264,7 @@ public class Dns {
         } else if((intlen = Integer.parseInt(data.substring(0, 2), 16)) != 0){
             // If we have a word
             // System.out.println("intlen = "+intlen);
-            String domain = ProtocolParser.HexaToAscii(dnsData.substring(cursor+2, cursor+2+intlen*2));
+            String domain = ProtocolParser.hexaToAscii(dnsData.substring(cursor+2, cursor+2+intlen*2));
             word += domain + ".";
             cursor += 2+intlen*2;
         }
@@ -312,7 +312,7 @@ public class Dns {
             // System.out.println("DOmain on : "+dnsData.substring(pointer+2, pointer+2+intlen*2));
 
             while(intlen != 0 && !len.startsWith("11")){
-                String domain = ProtocolParser.HexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
+                String domain = ProtocolParser.hexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
                 // System.out.println("Domain : "+domain);
                 word += domain + ".";
                 pointer += 2+intlen*2;
@@ -337,7 +337,7 @@ public class Dns {
             intlen = Integer.parseInt(data.substring(0, 2), 16);
 
             while(intlen != 0 && !len.startsWith("11")){
-                String domain = ProtocolParser.HexaToAscii(dnsData.substring(cursor+2, cursor+2+intlen*2));
+                String domain = ProtocolParser.hexaToAscii(dnsData.substring(cursor+2, cursor+2+intlen*2));
                 word += domain + ".";
                 cursor += 2+intlen*2;
 
