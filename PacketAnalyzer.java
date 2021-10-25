@@ -6,7 +6,7 @@ import java.util.Map;
 public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
-        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0;
+        int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0, httpC = 0;
 
         PcapReader pcapReader = new PcapReader("tcp.pcap");
 
@@ -74,8 +74,6 @@ public class PacketAnalyzer {
                                 System.out.println(ipv4);
                                 // System.out.println("IPV4 Headers : "+ipv4.getIpv4Headers());
 
-                                int ipv4PayloadSize = (ipv4.getHeaderLengthBytes());
-
                                 // System.out.println("Payload ipv4 Size : "+ipv4PayloadSize);
 
                                 // Decapsulation from IPv4
@@ -100,7 +98,7 @@ public class PacketAnalyzer {
                                             currentPacket = tcp.getPayload();
 
                                             System.out.println("TCP Payload : "+tcp.getPayload());
-                                            System.out.println("TCP Payload Ascii : \n"+ProtocolParser.hexaToAscii(tcp.getPayload()));
+                                            // System.out.println("TCP Payload Ascii : \n"+ProtocolParser.hexaToAscii(tcp.getPayload()));
 
                                             //Ajouter le parsing de http ici
 
@@ -115,7 +113,21 @@ public class PacketAnalyzer {
 
                                             String currentPacketAscii = ProtocolParser.hexaToAscii(tcp.getPayload());
 
+                                            HttpRequest httpRequest = ProtocolParser.recognizeHttpRequest(currentPacketAscii);
+
+                                            HttpResponse httpResponse = ProtocolParser.recognizeHttpResponse(currentPacketAscii);
+
                                             Ftp ftp = ProtocolParser.recognizeFtp(currentPacketAscii);
+
+                                            if(httpRequest.isMatched()){
+                                                httpC++;
+                                                System.out.println(httpRequest);
+                                            }
+
+                                            if(httpResponse.isMatched()){
+                                                httpC++;
+                                                System.out.println(httpResponse);
+                                            }
 
                                             if(ftp.getIsMatched()){
 
@@ -155,6 +167,23 @@ public class PacketAnalyzer {
 
                                             }
 
+                                            String currentPacketAscii = ProtocolParser.hexaToAscii(udp.getUdpData());
+
+                                            HttpRequest httpRequest = ProtocolParser.recognizeHttpRequest(currentPacketAscii);
+
+                                            HttpResponse httpResponse = ProtocolParser.recognizeHttpResponse(currentPacketAscii);
+
+
+                                            if(httpRequest.isMatched()){
+                                                httpC++;
+                                                System.out.println(httpRequest);
+                                            }
+
+                                            if(httpResponse.isMatched()){
+                                                httpC++;
+                                                System.out.println(httpResponse);
+                                            }
+
                                             // Trying to recognize DNS
                                             if(udp.getDestPort() == 53 ||  udp.getSourcePort() == 53){
 
@@ -164,8 +193,6 @@ public class PacketAnalyzer {
 
                                                     dnsC++;
                                                     System.out.println(dns);
-                                                    System.out.println("DNS data : "+dns.getDnsData());
-                                                    dns.parseDnsData();
                                                 }
                                             }
 
@@ -223,6 +250,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC+"\nHTTP : "+httpC);
     }
 }

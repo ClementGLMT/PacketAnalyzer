@@ -239,35 +239,52 @@ public class ProtocolParser {
         }
     }
 
-    public static Http recognizeHttp(String packetData){
+    public static HttpRequest recognizeHttpRequest(String packetDataAscii){
 
         String http09and10Regex = "^(GET|OPTIONS|HEAD|POST|PUT|DELETE|TRACE|CONNECT) (((https?|http|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/)) HTTP/(?:[01]\\.[09])";
         String http11Regex = "^(GET|OPTIONS|HEAD|POST|PUT|DELETE|TRACE|CONNECT) (((https?|http|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|])|(/)) HTTP/1\\.1\\r\\n([\\x20-\\x7E].*:[\\x20-\\x7E].*\\r\\n)*[hH][oO][sS][tT]:";
 
         Pattern r = Pattern.compile(http11Regex);
 
-        Matcher m = r.matcher(packetData);
+        Matcher m = r.matcher(packetDataAscii);
 
         boolean result = m.find();
 
         if(result){
 
-            Http http = new Http(m.group(1), m.group(2), m.group(0).substring(m.group(0).indexOf("\n")+1));
+            HttpRequest http = new HttpRequest(m.group(1), m.group(2), packetDataAscii.substring(packetDataAscii.indexOf("\n")+1));
             return http;
 
         } else {
             r = Pattern.compile(http09and10Regex);
 
-            m = r.matcher(packetData);
+            m = r.matcher(packetDataAscii);
     
             result = m.find();
 
             if(result){
-                Http http = new Http(m.group(1), m.group(2), m.group(0).substring(m.group(0).indexOf("\n")+1));
+                HttpRequest http = new HttpRequest(m.group(1), m.group(2), packetDataAscii.substring(packetDataAscii.indexOf("\n")+1));
                 return http;
             } else {
-                return new Http();
+                return new HttpRequest();
             }
+        }
+    }
+
+    public static HttpResponse recognizeHttpResponse(String packetDataAscii){
+
+        String httpResponsePattern = "^HTTP/[10].[019] (\\d{3}) ([\\x20-\\x7E]*)\\r\\n";
+
+        Pattern r = Pattern.compile(httpResponsePattern);
+
+        Matcher m = r.matcher(packetDataAscii);
+
+        boolean result = m.find();
+
+        if(result){
+            return new HttpResponse(Integer.parseInt(m.group(1)), m.group(2), packetDataAscii.substring(packetDataAscii.indexOf("\n")+1));
+        } else {
+            return new HttpResponse();
         }
     }
 
