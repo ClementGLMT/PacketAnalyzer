@@ -6,8 +6,9 @@ public class HttpResponse {
     private int responseCode;
     private String responseMsg;
     private boolean isMatched;
-    private String httpData;
+    private String httpPacket;
     private String httpHeaders;
+    private String httpData;
     private Hashtable<String, String> headers;
 
     public int getResponseCode() {
@@ -35,23 +36,24 @@ public class HttpResponse {
     }
 
     public String getHttpData(){
-        return httpData;
+        return httpPacket;
     }
 
-    public HttpResponse(int responseCode, String responseMsg, String httpData){
+    public HttpResponse(int responseCode, String responseMsg, String httpPacket){
         this.responseCode = responseCode;
         this.responseMsg = responseMsg;
-        this.httpData = httpData;
-        this.httpHeaders = httpData.substring(0, httpData.indexOf("\r\n\r\n")+4);
+        this.httpPacket = httpPacket;
+        this.httpHeaders = httpPacket.substring(0, httpPacket.indexOf("\r\n\r\n")+4);
         this.headers = new Hashtable<String, String>();
         parseHeaders(this.httpHeaders);
+        this.httpData = httpPacket.substring(httpPacket.indexOf("\r\n\r\n")+4);
         this.isMatched = true;
     }
 
     public HttpResponse(){
         this.responseCode = 0;
         this.responseMsg = "";
-        this.httpData = "";
+        this.httpPacket = "";
         this.isMatched = false;
     }
 
@@ -70,7 +72,7 @@ public class HttpResponse {
     }
 
     public String toString(){
-        return "------HTTP------\nResponse code : "+responseCode+"\nResponse reason : "+responseMsg+headersToString();
+        return "------HTTP------\nResponse code : "+responseCode+"\nResponse reason : "+responseMsg+headersToString()+"\nHTTP Response data : \n"+httpData;
     }
     
 }

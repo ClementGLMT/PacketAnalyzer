@@ -87,7 +87,7 @@ public class Dhcp {
         this.broadcastFlag = Character.getNumericValue(flagss.charAt(0));
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

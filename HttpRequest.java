@@ -6,16 +6,16 @@ public class HttpRequest {
     private String method;
     private String uri;
     // private String version;
-    private String httpData;
+    private String httpPacket;
     private String httpHeaders;
     private boolean isMatched;
     private HashMap<String, String> headers;
 
-    public HttpRequest(String method, String uri, String httpData){
+    public HttpRequest(String method, String uri, String httpPacket){
         this.method = method;
         this.uri = uri;
-        this.httpData = httpData;
-        this.httpHeaders = httpData.substring(0, httpData.indexOf("\r\n\r\n")+4);
+        this.httpPacket = httpPacket;
+        this.httpHeaders = httpPacket.substring(0, httpPacket.indexOf("\r\n\r\n")+4);
         this.headers = new HashMap<String, String>();
         parseHeaders(this.httpHeaders);
         isMatched = true;
@@ -24,7 +24,7 @@ public class HttpRequest {
     public HttpRequest(){
         this.method = "";
         this.uri = "";
-        this.httpData = "";
+        this.httpPacket = "";
         isMatched = false;
     }
 
@@ -50,12 +50,12 @@ public class HttpRequest {
         this.uri = uri;
     }
 
-    public String getHttpData() {
-        return httpData;
+    public String getHttpPacket() {
+        return httpPacket;
     }
 
-    public void setHttpData(String httpData) {
-        this.httpData = httpData;
+    public void setHttpPacket(String httpData) {
+        this.httpPacket = httpData;
     }
 
     public boolean isMatched(){

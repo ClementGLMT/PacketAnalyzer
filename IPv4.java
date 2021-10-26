@@ -67,7 +67,7 @@ public class IPv4 {
         return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

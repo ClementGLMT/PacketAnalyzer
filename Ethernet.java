@@ -48,7 +48,7 @@ public class Ethernet {
         return etherTypeHuman;
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

@@ -74,7 +74,7 @@ public class Tcp {
         this.isMatched = false;
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

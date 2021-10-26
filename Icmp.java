@@ -32,7 +32,7 @@ public class Icmp {
 
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

@@ -19,7 +19,7 @@ public class Ftp {
         isMatched = false;    
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 

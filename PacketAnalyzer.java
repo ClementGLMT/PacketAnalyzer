@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // javac *.java && java PacketAnalyzer
 
@@ -7,6 +9,8 @@ public class PacketAnalyzer {
     public static void main(String[] args){
         int i;
         int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0, httpC = 0;
+
+        int newDnsC = 0;
 
         PcapReader pcapReader = new PcapReader("tcp.pcap");
 
@@ -23,13 +27,13 @@ public class PacketAnalyzer {
         // For each packet in the file
         for (i=0; i < packetList.size(); i++) {
 
-            System.out.println("\n------------Packet "+(i+1)+"------------");
+            // System.out.println("\n------------Packet "+(i+1)+"------------");
 
             String currentPacket = packetList.get(i).getPacketData();
 
-            System.out.println("Packet Data :\n"+currentPacket);
+            // System.out.println("Packet Data :\n"+currentPacket);
 
-            System.out.println("Network : "+headers.get("network"));
+            // System.out.println("Network : "+headers.get("network"));
 
             if(((String) headers.get("network")).equals("0001")){
 
@@ -37,7 +41,10 @@ public class PacketAnalyzer {
                 Ethernet eth = ProtocolParser.recognizeEthernet(currentPacket);
 
                 // If Ethernet is recognized
-                if(eth.getIsMatched()){
+                if(eth.isMatched()){
+
+                    // Updating packet with ethernet information
+                    packetList.set(i, packetList.get(i).addEthernet(eth));
 
                     // Increments Counter
                     ethC++;
@@ -62,7 +69,7 @@ public class PacketAnalyzer {
                             IPv4 ipv4 = ProtocolParser.recognizeIPv4(currentPacket, ipv4headerLength);
 
                             // If IPv4 is recognized
-                            if(ipv4.getIsMatched() && (ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)){
+                            if(ipv4.isMatched() && (ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)){
 
                                 // System.out.println("Dont fragment : "+ipv4.getDontFragment());
                                 // System.out.println("More fragment : "+ipv4.getMoreFragment());
@@ -89,7 +96,7 @@ public class PacketAnalyzer {
 
                                         Tcp tcp = ProtocolParser.recognizeTcp(currentPacket, DO);
 
-                                        if(tcp.getIsMatched()){
+                                        if(tcp.isMatched()){
 
                                             tcpC++;
 
@@ -129,7 +136,7 @@ public class PacketAnalyzer {
                                                 System.out.println(httpResponse);
                                             }
 
-                                            if(ftp.getIsMatched()){
+                                            if(ftp.isMatched()){
 
                                                 if(ftp.getResponseCode() == 227){
                                                     // Regex : "Entering Passive Mode \([0-9]{1,3},[0-9]{1,3},[0-9]{1,3},[0-9]{1,3},([0-9]{1,4}),([0-9]{1,4})\)"
@@ -148,7 +155,7 @@ public class PacketAnalyzer {
 
                                         Udp udp = ProtocolParser.recognizeUdp(currentPacket, ipv4.getTotalLength()-ipv4.getHeaderLengthBytes());
 
-                                        if(udp.getIsMatched()){
+                                        if(udp.isMatched()){
 
                                             udpC++;
 
@@ -159,7 +166,7 @@ public class PacketAnalyzer {
                                             // Trying to recognize DHCP
                                             Dhcp dhcp = ProtocolParser.recognizeDhcp(udp.getUdpData());
 
-                                            if(dhcp.getIsMatched()){
+                                            if(dhcp.isMatched()){
 
                                                 dhcpC++;
 
@@ -184,12 +191,33 @@ public class PacketAnalyzer {
                                                 System.out.println(httpResponse);
                                             }
 
+                                            // System.out.println("UDP Data Ascii :\n"+currentPacketAscii);
+
+                                            String dnsRegex = "^(?:[0-9a-fA-F]{24})([0-9a-fA-F]{2})((?:(?:2d)|(?:3[0-9])|(?:4(?:[1-9]|[a-f]))|(?:5(?:[0-9]|a))|(?:6(?:[1-9]|[a-f]))|(?:7(?:[0-9]|a)))+)";
+
+                                            Pattern r = Pattern.compile(dnsRegex);
+
+                                            Matcher m = r.matcher(udp.getUdpData());
+                                    
+                                            boolean result = m.find();
+
+                                            if(result){
+                                                System.out.println("DNS matched");
+                                                System.out.println("Size : "+Integer.parseInt(m.group(1), 16));
+                                                System.out.println("Length du bousin : "+m.group(2).length()*2);
+                                                if(Integer.parseInt(m.group(1), 16)*2 == m.group(2).length()){
+                                                    System.out.println("DNS matched and checked");
+                                                    newDnsC++;
+
+                                                }
+                                            }
+
                                             // Trying to recognize DNS
                                             if(udp.getDestPort() == 53 ||  udp.getSourcePort() == 53){
 
                                                 Dns dns = ProtocolParser.recognizeDns(udp.getUdpData());
 
-                                                if(dns.getIsMatched()){
+                                                if(dns.isMatched()){
 
                                                     dnsC++;
                                                     System.out.println(dns);
@@ -204,7 +232,7 @@ public class PacketAnalyzer {
                                         
                                         Icmp icmp = ProtocolParser.recognizeIcmp(currentPacket);
 
-                                        if(icmp.getIsMatched()){
+                                        if(icmp.isMatched()){
 
                                             icmpC++;
 
@@ -228,7 +256,7 @@ public class PacketAnalyzer {
                             Arp arp = ProtocolParser.recognizeArp(headers, currentPacket);
 
                             // If ARP is recognized
-                            if(arp.getIsMatched()){
+                            if(arp.isMatched()){
 
                                 // Increments Counter
                                 arpC++;
@@ -250,6 +278,6 @@ public class PacketAnalyzer {
                 System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC+"\nHTTP : "+httpC);
+        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC+"\nHTTP : "+httpC+"\nDNS counter regex : "+newDnsC);
     }
 }

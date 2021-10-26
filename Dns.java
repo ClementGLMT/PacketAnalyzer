@@ -127,7 +127,7 @@ public class Dns {
         return r;
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 
@@ -162,7 +162,7 @@ public class Dns {
 
         String answer = dnsData.substring(cursor, max);
 
-        System.out.println("Answer : "+answer);
+        // System.out.println("Answer : "+answer);
 
         // A
         if(type == 1){
@@ -383,7 +383,7 @@ public class Dns {
         for(i=0 ; i < Integer.parseInt(answerRRs, 16); i++){
             DnsResponse answer = new DnsResponse();
 
-            System.out.println("From cursor : "+dnsData.substring(cursor));
+            // System.out.println("From cursor : "+dnsData.substring(cursor));
 
 
 

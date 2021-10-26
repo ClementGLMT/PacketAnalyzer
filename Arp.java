@@ -49,7 +49,7 @@ public class Arp {
         }
     }
 
-    public boolean getIsMatched(){
+    public boolean isMatched(){
         return isMatched;
     }
 
