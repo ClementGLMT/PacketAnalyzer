@@ -157,7 +157,7 @@ public class Packet {
     }
 
     public IPv4 getIpv4() {
-        return ipv4;
+        return this.ipv4;
     }
 
     public Icmp getIcmp() {

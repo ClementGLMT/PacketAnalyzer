@@ -12,7 +12,7 @@ public class PacketAnalyzer {
     private static FtpData ftpData = new FtpData();
     private static Hashtable<String, ArrayList<Packet>> packetsById = new Hashtable<String, ArrayList<Packet>>();
 
-    private static Packet parsePacketProtocols(Map<String, Object> globalHeaders, Packet packet){
+    private static Packet parsePacketProtocols(Map<String, Object> globalHeaders, Packet packet, boolean isReassembled){
 
         String currentPacket = packet.getPacketData();
 
@@ -37,6 +37,9 @@ public class PacketAnalyzer {
                 // Case IPv4 as Layer 3 protocol
                 case "IPv4":
 
+                    // if(isReassembled)
+                    //     currentPacket = packet.getIpv4().getPayload();
+
                     int ipv4headerLength = Integer.parseInt((String.valueOf(currentPacket.charAt(1))) , 16);
 
                     // Trying to recognize IPv4
@@ -56,8 +59,8 @@ public class PacketAnalyzer {
                         currentPacket = currentPacket.substring(ipv4.getHeaderLengthBytes()*2);
                         ipv4.setPayload(currentPacket);
 
-                        // If we don't have IP fragmentation
-                        if((ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)){
+                        // We don't treat IP fragmentation case here
+                        if(((ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)) || isReassembled){
                             // System.out.println("Dont fragment : "+ipv4.getDontFragment());
                             // System.out.println("More fragment : "+ipv4.getMoreFragment());
                             // System.out.println("Offset : "+ipv4.getIntFragmentOffset());
@@ -269,29 +272,38 @@ public class PacketAnalyzer {
         for (Packet p: packets){
             if(p.getIpv4().getFragmentOffsetBytes()*8 == 0 && p.getIpv4().getMoreFragment() == 1){
                 reassembled = p;
+                // System.out.println("Initialized with payload :\n"+reassembled.getIpv4().getPayload());
                 currentOffset += p.getIpv4().getPayloadLength();
                 packets.remove(i);
             }
             i++;
         }
-        System.out.println("Current offset after initialization : "+currentOffset);
-        System.out.println("Initalized packet id : "+reassembled.getIpv4().getIdentification());
-        i=0;
-        int todelete=0;
-        while(packets.size() != 0){
-            for(Packet p: packets){
-                System.out.println("Offset testing : "+p.getIpv4().getFragmentOffsetBytes());
-                System.out.println("Packet id testing : "+p.getIpv4().getIdentification());
 
-                if(p.getIpv4().getFragmentOffsetBytes() == currentOffset){
-                    reassembled.getIpv4().setPayload(reassembled.getIpv4().getPayload() + p.getIpv4().getPayload());
-                    currentOffset += p.getIpv4().getPayloadLength();
-                    todelete = i;
-                    break;
+        // System.out.println("Current offset after initialization : "+currentOffset);
+        // System.out.println("Initalized packet id : "+reassembled.getIpv4().getIdentification());
+
+        // If the precedent if statement didn't match, currentOffset will be equal to 0
+        // In this case, it's a coincidence that the 2 packets have the same ID
+        if(currentOffset != 0){
+            i=0;
+            int todelete=0;
+            while(packets.size() != 0){
+                for(Packet p: packets){
+                    // System.out.println("Offset testing : "+p.getIpv4().getFragmentOffsetBytes());
+                    // System.out.println("Packet id testing : "+p.getIpv4().getIdentification());
+
+                    if(p.getIpv4().getFragmentOffsetBytes() == currentOffset){
+                        reassembled.setPacketData(reassembled.getPacketData()+ p.getIpv4().getPayload());
+                        // System.out.println("New reassembled payload :\n"+reassembled.getIpv4().getPayload());
+                        currentOffset += p.getIpv4().getPayloadLength();
+                        todelete = i;
+                        break;
+                    }
+                    i++;
                 }
-                i++;
+                packets.remove(todelete);
             }
-            packets.remove(todelete);
+            return reassembled;
         }
         return reassembled;
     }
@@ -315,7 +327,7 @@ public class PacketAnalyzer {
             // For each packet in the file, parse its data
             for (packetCounter=0; packetCounter < packetList.size(); packetCounter++) {
 
-                Packet packet = parsePacketProtocols(globalHeaders, packetList.get(packetCounter));
+                Packet packet = parsePacketProtocols(globalHeaders, packetList.get(packetCounter), false);
 
                 if(packet.getIpv4().isMatched() && !packet.getIpv4().getIdentification().equals("0000")){
                     if(packetsById.putIfAbsent(packet.getIpv4().getIdentification(), new ArrayList<Packet>(Arrays.asList(new Packet[] {packet}))) != null){
@@ -333,7 +345,33 @@ public class PacketAnalyzer {
             System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
         }
 
-        
+        int count = 1;
+        for (Map.Entry<String, ArrayList<Packet>> e : packetsById.entrySet()){
+            if(e.getValue().size() > 1){
+                // System.out.println("\nEntry "+count+" :\n\t"+Integer.parseInt(e.getKey(), 16)+" "+e.getValue().size());
+                Packet reassembledPacket = reassemblPacket(e.getValue());
+                if(!reassembledPacket.getPacketData().equals("")){
+                    // reassembledPacket.getIpv4().setIntFragmentOffset(0);
+                    // System.out.println("More fragment before modif : "+reassembledPacket.getIpv4().getMoreFragment());
+                    // reassembledPacket.getIpv4().setMoreFragment(0);
+                    // System.out.println("More fragment after modif : "+reassembledPacket.getIpv4().getMoreFragment());
+                    // System.out.println("\nPacket reassembled before inserting reassembledPackets : \n"+reassembledPacket);
+                    reassembledPackets.add(reassembledPacket);
+                }
+            }
+            count++;
+        }
+        System.out.println("\n\n------------Reassembled packets------------");
+
+        count = 1;
+        for(Packet p: reassembledPackets){
+            System.out.println("\n\n------Packet "+count+"------");
+            p = parsePacketProtocols(globalHeaders, p, true);
+            System.out.println(p);
+            // System.out.println("IPv4 Payload :\n"+p.getIpv4().getPayload());
+            count++;
+        }
+
         packetCounter=1;
         for (Packet packet: packetList) {
             if(packetCounter == 2656){
@@ -344,27 +382,9 @@ public class PacketAnalyzer {
                     System.out.println("\n------DEBUG------");
                     packet.printDebug();
                 }
-
+            // Afficher au bon moment le paquet réassemblé
             }
             packetCounter++;
-        }
-
-        int count = 1;
-        for (Map.Entry<String, ArrayList<Packet>> e : packetsById.entrySet()){
-            if(e.getValue().size() > 1){
-                reassembledPackets.add(reassemblPacket(e.getValue()));
-                System.out.println("\nEntry "+count+" :\n\t"+e.getKey()+" "+e.getValue().size());
-            }
-            count++;
-        }
-        System.out.println("\n\n------------Reassembled packets------------");
-
-        count = 1;
-        for(Packet p: reassembledPackets){
-            System.out.println("\n\n------Packet "+count+"------");
-            p = parsePacketProtocols(globalHeaders, p);
-            System.out.println(p);
-            count++;
         }
 
         

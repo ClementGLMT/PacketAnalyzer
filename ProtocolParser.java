@@ -72,6 +72,12 @@ public class ProtocolParser {
 
         boolean result = m.find();
 
+        // System.out.println("UDP Source port : "+Integer.parseInt(m.group(1), 16));
+        // System.out.println("UDP dest port : "+Integer.parseInt(m.group(2), 16));
+        // System.out.println("UDP Data length : "+Integer.parseInt(m.group(3), 16));
+        // System.out.println("Udp Data without headers : \n"+packetData.substring(16));
+        // System.out.println("Udp data without header length in Bytes : "+packetData.substring(16).length()/2);
+
         if(result){
 
             Udp udp = new Udp(Integer.parseInt(m.group(1), 16), Integer.parseInt(m.group(2), 16), Integer.parseInt(m.group(3), 16), m.group(4), udpHeaders, packetData.substring(16, (Integer.parseInt(m.group(3), 16)-8)*2+16));

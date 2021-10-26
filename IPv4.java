@@ -117,8 +117,16 @@ public class IPv4 {
         return moreFragment;
     }
 
+    public void setMoreFragment(int moreFragment){
+        this.moreFragment = moreFragment;
+    }
+
     public int getIntFragmentOffset(){
         return intFragmentOffset;
+    }
+
+    public void setIntFragmentOffset(int fragmentOffset){
+        this.intFragmentOffset = fragmentOffset;
     }
 
     public int getFragmentOffsetBytes(){
