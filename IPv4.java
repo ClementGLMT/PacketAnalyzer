@@ -15,6 +15,7 @@ public class IPv4 {
     private String options;
     private String ipv4Headers;
     private boolean isMatched;
+    private String payload;
 
     private int dontFragment;
     private int moreFragment;
@@ -32,9 +33,7 @@ public class IPv4 {
         // System.out.println("offset given : "+fragmentOffset);
 
         this.resolveFlags(this.flags);
-        System.out.println("offset between resolutions : "+this.fragmentOffset);
-        this.fragmentOffset += fragmentOffset;
-        System.out.println("offset in Constructor : "+this.fragmentOffset);
+        // this.fragmentOffset += fragmentOffset;
 
         this.ttl = ttl;
         this.protocol = protocol;
@@ -43,6 +42,7 @@ public class IPv4 {
         this.destinationAdress = destinationAdress;
         this.options = options;
         this.ipv4Headers = ipv4Headers;
+        this.payload = "";
         this.isMatched = true;
     }
 
@@ -64,7 +64,7 @@ public class IPv4 {
     }
 
     public String toString(){
-        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
+        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+intFragmentOffset+"\nFragmentOffset String : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 
     public boolean isMatched(){
@@ -95,7 +95,19 @@ public class IPv4 {
         this.fragmentOffset = myFlags.substring(3);
         this.intFragmentOffset = Integer.parseInt(this.fragmentOffset, 2);
  
-     }
+    }
+
+    public String getPayload(){
+        return payload;
+    }
+
+    public void setPayload(String payload){
+        this.payload = payload;
+    }
+
+    public int getPayloadLength(){
+        return payload.length()/2;
+    }
 
     public int getDontFragment(){
         return dontFragment;
@@ -107,6 +119,10 @@ public class IPv4 {
 
     public int getIntFragmentOffset(){
         return intFragmentOffset;
+    }
+
+    public int getFragmentOffsetBytes(){
+        return intFragmentOffset*8;
     }
 
     public int getHeaderLength(){
@@ -131,5 +147,9 @@ public class IPv4 {
 
     public String getDestinationAddress(){
         return destinationAdress;
+    }
+
+    public String getIdentification(){
+        return identification;
     }
 }

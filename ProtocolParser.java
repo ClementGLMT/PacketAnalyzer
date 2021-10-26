@@ -129,23 +129,44 @@ public class ProtocolParser {
 
     public static Dns recognizeDns(String packetData){
 
-        String dnsHeaders = packetData.substring(0, 24);
-        
-        String dnsData = packetData.substring(24);
 
-        String dnsPattern = "([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})";
-        
-        Pattern r = Pattern.compile(dnsPattern);
+        String dnsRegex = "^(?:[0-9a-fA-F]{24})([0-9a-fA-F]{2})((?:(?:2d)|(?:3[0-9])|(?:4(?:[1-9]|[a-f]))|(?:5(?:[0-9]|a))|(?:6(?:[1-9]|[a-f]))|(?:7(?:[0-9]|a)))+)";
 
-        Matcher m = r.matcher(dnsHeaders);
+        Pattern r = Pattern.compile(dnsRegex);
+
+        Matcher m = r.matcher(packetData);
 
         boolean result = m.find();
 
         if(result){
 
-            Dns dns = new Dns(m.group(1), Integer.parseInt(m.group(2), 16), m.group(3), m.group(4), m.group(5), m.group(6), dnsData);
-            return dns;
+            // If we really have DNS (check on the size given and the name that follows)
+            if(Integer.parseInt(m.group(1), 16)*2 == m.group(2).length()){
 
+                String dnsHeaders = packetData.substring(0, 24);
+        
+                String dnsData = packetData.substring(24);
+
+                String dnsPattern = "([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})";
+                
+                r = Pattern.compile(dnsPattern);
+
+                m = r.matcher(dnsHeaders);
+
+                result = m.find();
+
+                if(result){
+
+                    Dns dns = new Dns(m.group(1), Integer.parseInt(m.group(2), 16), m.group(3), m.group(4), m.group(5), m.group(6), dnsData);
+                    return dns;
+
+                } else {
+                    return new Dns();
+                }
+            } else {
+                return new Dns();
+            }
+            
         } else {
             return new Dns();
         }
@@ -165,7 +186,7 @@ public class ProtocolParser {
         }
         String ftpPattern = "^("+ftpCommands.substring(0, ftpCommands.length()-1)+") ?([ -~]*)?\r\n";
 
-        System.out.println(ftpPattern);
+        // System.out.println(ftpPattern);
 
         // Building a regex for matching a response
         String ftpReplyCodes = "";

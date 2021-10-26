@@ -17,9 +17,14 @@ public class Packet {
 
     private Dhcp dhcp;
     private Ftp ftp;
+    private FtpData ftpData;
     private Dns dns;
     private HttpRequest httpRequest;
     private HttpResponse httpResponse;
+
+    private boolean dnsRegexMatch;
+
+    private String debug;
 
     public Packet(Map<String, Object> packetHeaders, String packetData){
         this.packetHeaders = packetHeaders;
@@ -33,9 +38,12 @@ public class Packet {
         this.udp = new Udp();
         this.dhcp = new Dhcp();
         this.ftp = new Ftp();
+        this.ftpData = new FtpData();
         this.dns = new Dns();
         this.httpRequest = new HttpRequest();
         this.httpResponse = new HttpResponse();
+        this.dnsRegexMatch = false;
+        this.debug = "";
     }
 
     public Packet() {
@@ -50,9 +58,34 @@ public class Packet {
         this.udp = new Udp();
         this.dhcp = new Dhcp();
         this.ftp = new Ftp();
+        this.ftpData = new FtpData();
         this.dns = new Dns();
         this.httpRequest = new HttpRequest();
         this.httpResponse = new HttpResponse();
+        this.dnsRegexMatch = false;
+        this.debug = "";
+    }
+
+    public Packet addDebug(String d){
+        this.debug += d+"\n";
+        return this;
+    }
+
+    public void printDebug(){
+        System.out.println(debug);
+    }
+
+    public boolean hasDebug(){
+        return !this.debug.equals("");
+    }
+
+    public boolean isDnsRegexMatch() {
+        return dnsRegexMatch;
+    }
+
+    public Packet setDnsRegexMatch(boolean dnsRegexMatch) {
+        this.dnsRegexMatch = dnsRegexMatch;
+        return this;
     }
 
     public Packet addEthernet(Ethernet eth){
@@ -110,6 +143,59 @@ public class Packet {
         return this;
     }
 
+    public Packet addFtpData(FtpData ftpData){
+        this.ftpData = ftpData;
+        return this;
+    }
+
+    public Ethernet getEth() {
+        return eth;
+    }
+
+    public Arp getArp() {
+        return arp;
+    }
+
+    public IPv4 getIpv4() {
+        return ipv4;
+    }
+
+    public Icmp getIcmp() {
+        return icmp;
+    }
+
+    public Tcp getTcp() {
+        return tcp;
+    }
+
+    public Udp getUdp() {
+        return udp;
+    }
+
+    public Dhcp getDhcp() {
+        return dhcp;
+    }
+
+    public Ftp getFtp() {
+        return ftp;
+    }
+
+    public FtpData getFtpData(){
+        return ftpData;
+    }
+
+    public Dns getDns() {
+        return dns;
+    }
+
+    public HttpRequest getHttpRequest() {
+        return httpRequest;
+    }
+
+    public HttpResponse getHttpResponse() {
+        return httpResponse;
+    }
+
     public int getPacketSize(){
         return (int) packetHeaders.get("incl_len");
     }
@@ -134,30 +220,32 @@ public class Packet {
         String r = "\n\n";
 
         if(eth.isMatched())
-            r += eth.toString();
+            r += "\n"+eth.toString();
 
         if(arp.isMatched())
-            r += arp.toString();
+            r += "\n\n"+arp.toString();
         if(ipv4.isMatched())
-            r += ipv4.toString();
+            r += "\n\n"+ipv4.toString();
 
         if(icmp.isMatched())
-            r += icmp.toString();
+            r += "\n\n"+icmp.toString();
         if(tcp.isMatched())
-            r += tcp.toString();
+            r += "\n\n"+tcp.toString();
         if(udp.isMatched())
-            r += udp.toString();
+            r += "\n\n"+udp.toString();
 
         if(dhcp.isMatched())
-            r += dhcp.toString();
+            r += "\n\n"+dhcp.toString();
         if(ftp.isMatched())
-            r += ftp.toString();
+            r += "\n\n"+ftp.toString();
+        if(ftpData.isMatched())
+            r += "\n\n"+ftpData.toString();
         if(dns.isMatched())
-            r += dns.toString();
+            r += "\n\n"+dns.toString();
         if(httpRequest.isMatched())
-            r += httpRequest.toString();
+            r += "\n\n"+httpRequest.toString();
         if(httpResponse.isMatched())
-            r += httpResponse.toString();
+            r += "\n\n"+httpResponse.toString();
 
         return "\n\nHEADERS : " + this.packetHeaders + "\nDATA : " + this.packetData+r;
     }
