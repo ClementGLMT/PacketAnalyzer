@@ -102,6 +102,7 @@ public class IPv4 {
     }
 
     public void setPayload(String payload){
+        System.out.println("Setting payload to :\n"+payload);
         this.payload = payload;
     }
 
