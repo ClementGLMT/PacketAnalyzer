@@ -6,6 +6,8 @@ public class Packet {
     private Map<String, Object> packetHeaders;
     private String packetData;
 
+    private Packet reassembledPacket;
+
     private Ethernet eth;
     
     private Arp arp;
@@ -29,6 +31,7 @@ public class Packet {
     public Packet(Map<String, Object> packetHeaders, String packetData){
         this.packetHeaders = packetHeaders;
         this.packetData = packetData;
+        this.reassembledPacket = new Packet();
 
         this.eth = new Ethernet();
         this.arp = new Arp();
@@ -49,6 +52,7 @@ public class Packet {
     public Packet() {
         this.packetHeaders = new Hashtable<String, Object>();
         this.packetData = "";
+        this.reassembledPacket = null;
 
         this.eth = new Ethernet();
         this.arp = new Arp();
@@ -64,6 +68,35 @@ public class Packet {
         this.httpResponse = new HttpResponse();
         this.dnsRegexMatch = false;
         this.debug = "";
+    }
+
+    public Packet(Packet p){
+        this.packetHeaders = p.getPacketHeaders();
+        this.packetData = p.getPacketData();
+        this.reassembledPacket = p.getReassembledPacket();
+
+        this.eth = p.getEth();
+        this.arp = p.getArp();
+        this.ipv4 = new IPv4(p.getIpv4());
+        this.icmp = p.getIcmp();
+        this.tcp = p.getTcp();
+        this.udp = p.getUdp();
+        this.dhcp = p.getDhcp();
+        this.ftp = p.getFtp();
+        this.ftpData = p.getFtpData();
+        this.dns = p.getDns();
+        this.httpRequest = p.getHttpRequest();
+        this.httpResponse = p.getHttpResponse();
+        this.dnsRegexMatch = p.isDnsRegexMatch();
+        this.debug = p.debug;
+    }
+
+    public Packet getReassembledPacket() {
+        return reassembledPacket;
+    }
+
+    public void assignReassembledPacket(Packet reassembledPacket) {
+        this.reassembledPacket = reassembledPacket;
     }
 
     public Packet addDebug(String d){
@@ -216,8 +249,64 @@ public class Packet {
         this.packetData = packetData;
     }
 
+    public void setEth(Ethernet eth) {
+        this.eth = eth;
+    }
+
+    public void setArp(Arp arp) {
+        this.arp = arp;
+    }
+
+    public void setIpv4(IPv4 ipv4) {
+        this.ipv4 = ipv4;
+    }
+
+    public void setIcmp(Icmp icmp) {
+        this.icmp = icmp;
+    }
+
+    public void setTcp(Tcp tcp) {
+        this.tcp = tcp;
+    }
+
+    public void setUdp(Udp udp) {
+        this.udp = udp;
+    }
+
+    public void setDhcp(Dhcp dhcp) {
+        this.dhcp = dhcp;
+    }
+
+    public void setFtp(Ftp ftp) {
+        this.ftp = ftp;
+    }
+
+    public void setFtpData(FtpData ftpData) {
+        this.ftpData = ftpData;
+    }
+
+    public void setDns(Dns dns) {
+        this.dns = dns;
+    }
+
+    public void setHttpRequest(HttpRequest httpRequest) {
+        this.httpRequest = httpRequest;
+    }
+
+    public void setHttpResponse(HttpResponse httpResponse) {
+        this.httpResponse = httpResponse;
+    }
+
+    public String getDebug() {
+        return debug;
+    }
+
+    public void setDebug(String debug) {
+        this.debug = debug;
+    }
+
     public String toString(){
-        String r = "\n\n";
+        String r = "";
 
         if(eth.isMatched())
             r += "\n"+eth.toString();
@@ -247,7 +336,9 @@ public class Packet {
         if(httpResponse.isMatched())
             r += "\n\n"+httpResponse.toString();
 
-        return "\n\nHEADERS : " + this.packetHeaders + "\nDATA : " + this.packetData+r;
+        return r;
+
+        // return "\n\nHEADERS : " + this.packetHeaders + "\nDATA : " + this.packetData+r;
     }
 
 }

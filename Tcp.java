@@ -168,7 +168,8 @@ public class Tcp {
     }
 
     public String toString(){
-        return "------TCP------\nSource port : "+sourcePort+"\nDestination port : "+destinationPort+"\nSequence number : "+sequenceNumber+"\nAcknowledgment number : "+acknowlegmentNumber+"\nHeader length : "+headerLength+" ("+getHeaderLengthBytes()+")\nFlags : "+flags+" "+flagsToString()+"\nWindow : "+window+"\nChecksum : "+checksum+"\nUrgent Pointer : "+urgentPointer+"\nOptions : "+options;
+        return "------TCP------\nFlags : "+flagsToString()+"\nPORTS : "+sourcePort+" ----> "+destinationPort;
+        // return "------TCP------\nSource port : "+sourcePort+"\nDestination port : "+destinationPort+"\nSequence number : "+sequenceNumber+"\nAcknowledgment number : "+acknowlegmentNumber+"\nHeader length : "+headerLength+" ("+getHeaderLengthBytes()+")\nFlags : "+flags+" "+flagsToString()+"\nWindow : "+window+"\nChecksum : "+checksum+"\nUrgent Pointer : "+urgentPointer+"\nOptions : "+options;
     }
     
 }

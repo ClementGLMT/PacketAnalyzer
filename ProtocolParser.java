@@ -324,6 +324,14 @@ public class ProtocolParser {
         return ipv4.substring(0, ipv4.length()-1);
     }
 
+    public static String toPrettyMac(String mac){
+        String prettyMac = "";
+        for(int i=0; i < mac.length(); i+=2){
+            prettyMac = prettyMac + mac.substring(i, i+2) + ":";
+        }
+        return prettyMac.substring(0, prettyMac.length()-1);
+    }
+
     private static String resolveEtherType(String etherType){
         switch (etherType) {
             case "0800":

@@ -34,7 +34,7 @@ public class Udp {
     }
 
     public String toString(){
-        return "------UDP------\nLength : "+length+"\nSource Port : "+sourcePort+"\nDestination Port : "+destinationPort+"\nChecksum : "+checksum;
+        return "------UDP------\nPayload length : "+length+"\n\nPORTS : "+sourcePort+" ----> "+destinationPort;
     }
 
     public String getUdpHeaders(){

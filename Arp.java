@@ -16,9 +16,9 @@ public class Arp {
         this.ptypeHuman = ptypeHuman;
         this.plen = plen;
         this.opcode = opcode;
-        this.senderHardwareAdress = senderHardwareAdress;
+        this.senderHardwareAdress = ProtocolParser.toPrettyMac(senderHardwareAdress);
         this.senderProtocolAddress = senderProtocolAddress;
-        this.targetHardwareAdress = targetHardwareAdress;
+        this.targetHardwareAdress = ProtocolParser.toPrettyMac(targetHardwareAdress);
         this.targetProtocolAddress = targetProtocolAddress;
         this.isMatched = true;
         this.arpHeaders = arpHeaders;
@@ -58,6 +58,18 @@ public class Arp {
     }
 
     public String toString(){
-        return "------ARP------\nProto : "+ptype+" ("+ptypeHuman+")\nOpcode : "+opcode+" ("+resolveOpCode()+")\nSender MAC @ : "+senderHardwareAdress+"\nSender Proto @ : "+senderProtocolAddress+"\nTarget MAC @ : "+targetHardwareAdress+"\nTarget Proto @ : "+targetProtocolAddress;
+        String descr = "";
+        switch(opcode){
+            case "0001":
+                descr = "What is your hardware address "+targetProtocolAddress+" ? Tell "+senderProtocolAddress+ (senderProtocolAddress.equals("0.0.0.0") ? " (Broadcast)" : "");
+                break;
+            case "0002":
+                descr = "I'm "+senderProtocolAddress+", my hardware address is : "+senderHardwareAdress;
+                break;
+            default:
+                break;
+        }
+        return "------ARP------\nLayer 3 protocol : "+ptypeHuman+"\nOpcode : "+resolveOpCode()+" ("+opcode+")\nHARDWARE : "+senderHardwareAdress+" ----> "+targetHardwareAdress+ (targetHardwareAdress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +"\n\n"+descr;
+        // return "------ARP------\nProto : "+ptype+" ("+ptypeHuman+")\nOpcode : "+opcode+" ("+resolveOpCode()+")\nSender MAC @ : "+senderHardwareAdress+"\nSender Proto @ : "+senderProtocolAddress+"\nTarget MAC @ : "+targetHardwareAdress+"\nTarget Proto @ : "+targetProtocolAddress+"\n"+descr;
     }
 }

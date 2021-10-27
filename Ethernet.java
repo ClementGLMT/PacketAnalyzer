@@ -9,8 +9,8 @@ public class Ethernet {
 
 
     public Ethernet(String destMacAddress, String sourceMacAddress, String  vlanEtherType, String etherType, String etherTypeHuman, String ethernetHeaders){
-        this.destMacAddress = destMacAddress;
-        this.sourceMacAddress = sourceMacAddress;
+        this.destMacAddress = ProtocolParser.toPrettyMac(destMacAddress);
+        this.sourceMacAddress = ProtocolParser.toPrettyMac(sourceMacAddress);
         this.vlanEtherType = vlanEtherType;
         this.etherType = etherType;
         this.etherTypeHuman = etherTypeHuman;
@@ -57,7 +57,7 @@ public class Ethernet {
     }
 
     public String toString(){
-        return "------ETHERNET------\nSource MAC @ : "+sourceMacAddress+"\nDestination MAC @ : "+destMacAddress+"\nEtherType : "+etherType+" ("+etherTypeHuman+")";
+        return "------ETHERNET------\nMAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
     }
     
 }

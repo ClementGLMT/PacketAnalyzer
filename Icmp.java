@@ -38,7 +38,9 @@ public class Icmp {
 
     public String toString(){
         resolveHumans();
-        return "------ICMP------\nType : "+type+" ("+typeHuman+")\nCode : "+code+" ("+codeHuman+")\nChecksum : "+checksum+"\nPayload : "+payload;
+        return "------ICMP------\nType : "+typeHuman+(codeHuman.equals("No code") ? "" : "\nCode : "+codeHuman)+"\nPayload length: "+(payload.length()/2);
+
+        // return "------ICMP------\nType : "+type+" ("+typeHuman+")\nCode : "+code+" ("+codeHuman+")\nChecksum : "+checksum+"\nPayload : "+payload;
     }
 
     public void resolveHumans(){
@@ -100,7 +102,7 @@ public class Icmp {
                         break;
 
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;
@@ -120,7 +122,7 @@ public class Icmp {
                         codeHuman = "Redirect datagram for the type of service and host";
                         break;
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;
@@ -138,7 +140,7 @@ public class Icmp {
                         codeHuman = "Does not route common traffic";
                         break;
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;
@@ -152,7 +154,7 @@ public class Icmp {
                         codeHuman = "Fragment reassembly time exceeded";
                         break;
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;
@@ -173,7 +175,7 @@ public class Icmp {
                         codeHuman = "The length is incorrect, suggesting that the packet is missing data";
                         break;
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;
@@ -207,7 +209,7 @@ public class Icmp {
                         codeHuman = "Need Authorization";
                         break;
                     default:
-                        codeHuman = "";
+                        codeHuman = "No code";
                         break;
                 }
                 break;

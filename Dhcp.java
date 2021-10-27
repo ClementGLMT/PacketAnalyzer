@@ -107,22 +107,25 @@ public class Dhcp {
         for (DhcpOption dhcpOption : options) {
             optionsString += dhcpOption.toString();
         }
-        return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
-        ")\nHardware type : "+htype+
-        "\nHarware Len : "+hlen+
-        "\nHops : "+hops+
-        "\nTransaction ID : "+transacId+
-        "\nSecond elapsed : "+secondElapsed+
-        "\nFlags : "+flags+
-        "\nBroadcast Flag : "+this.broadcastFlag+
-        "\nClient IP : "+clientIp+
-        "\nYour Client IP : "+yourClientIp+
-        "\nNext Server IP : "+nextServerIp+
-        "\nGateway IP : "+gatewayIp+
-        "\nClient MAC : "+clientMac+
-        "\nServer Hostname : "+serverHostName+
-        "\nBoot File : "+bootFile+
-        "\nOptions : "+optionsString;
+        String descr = "";
+        // switch(options.)
+        return "------DHCP------\nBoot Opcode : "+getOpCodeHuman();
+        // return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
+        // ")\nHardware type : "+htype+
+        // "\nHarware Len : "+hlen+
+        // "\nHops : "+hops+
+        // "\nTransaction ID : "+transacId+
+        // "\nSecond elapsed : "+secondElapsed+
+        // "\nFlags : "+flags+
+        // "\nBroadcast Flag : "+this.broadcastFlag+
+        // "\nClient IP : "+clientIp+
+        // "\nYour Client IP : "+yourClientIp+
+        // "\nNext Server IP : "+nextServerIp+
+        // "\nGateway IP : "+gatewayIp+
+        // "\nClient MAC : "+clientMac+
+        // "\nServer Hostname : "+serverHostName+
+        // "\nBoot File : "+bootFile+
+        // "\nOptions : "+optionsString;
     }
     
     

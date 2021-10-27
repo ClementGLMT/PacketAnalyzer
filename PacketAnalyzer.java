@@ -11,6 +11,8 @@ public class PacketAnalyzer {
     private static int arpC = 0, ethC = 0, ipv4C = 0, udpC = 0, icmpC = 0, tcpC = 0, dnsC = 0, ftpC = 0, ftpDataC = 0, dhcpC = 0, httpC = 0;
     private static FtpData ftpData = new FtpData();
     private static Hashtable<String, ArrayList<Packet>> packetsById = new Hashtable<String, ArrayList<Packet>>();
+    private static ArrayList<Packet> packetList;
+    private static Hashtable<String, Packet> reassembledPackets;
 
     private static Packet parsePacketProtocols(Map<String, Object> globalHeaders, Packet packet, boolean isReassembled){
 
@@ -26,7 +28,9 @@ public class PacketAnalyzer {
             packet.addEthernet(eth);
 
             // Increments Counter
-            ethC++;
+            if(!isReassembled){
+                ethC++;
+            }
 
             // Decapsulation from Ethernet
             currentPacket = currentPacket.substring(eth.getEthernetData().length());
@@ -50,8 +54,9 @@ public class PacketAnalyzer {
                     if(ipv4.isMatched()){
 
                         // Increments counter 
-                        ipv4C ++;
-
+                        if(!isReassembled){
+                            ipv4C ++;
+                        }
                         // Updating packet with Ipv4 information
                         packet.addIpv4(ipv4);
 
@@ -105,13 +110,17 @@ public class PacketAnalyzer {
                                         Ftp ftp = ProtocolParser.recognizeFtp(currentPacketAscii);
 
                                         if(httpRequest.isMatched()){
+                                            
                                             httpC++;
+
                                             packet.addHttpRequest(httpRequest);
                                             // System.out.println(httpRequest);
                                         }
 
                                         if(httpResponse.isMatched()){
+
                                             httpC++;
+                                            
                                             packet.addHttpResponse(httpResponse);
                                             // System.out.println(httpResponse);
                                         }
@@ -125,7 +134,7 @@ public class PacketAnalyzer {
                                             }
 
                                             ftpC++;
-
+  
                                             packet.addFtp(ftp);
                                         }
                                     }
@@ -137,9 +146,8 @@ public class PacketAnalyzer {
                                     Udp udp = ProtocolParser.recognizeUdp(currentPacket, ipv4.getTotalLength()-ipv4.getHeaderLengthBytes());
 
                                     if(udp.isMatched()){
-
+                                          
                                         udpC++;
-
                                         // System.out.println(udp);
                                         // System.out.println("UDP Headers : "+udp.getUdpHeaders());
                                         // System.out.println("UDP Data : "+udp.getUdpData());
@@ -150,9 +158,9 @@ public class PacketAnalyzer {
                                         Dhcp dhcp = ProtocolParser.recognizeDhcp(udp.getUdpData());
 
                                         if(dhcp.isMatched()){
-
+                                            
                                             dhcpC++;
-
+  
                                             packet.addDhcp(dhcp);
 
                                         }
@@ -164,14 +172,16 @@ public class PacketAnalyzer {
                                         HttpResponse httpResponse = ProtocolParser.recognizeHttpResponse(currentPacketAscii);
 
                                         if(httpRequest.isMatched()){
+                                            
                                             httpC++;
-                                            packet.addHttpRequest(httpRequest);
+                                             packet.addHttpRequest(httpRequest);
                                             // System.out.println(httpRequest);
                                         }
 
                                         if(httpResponse.isMatched()){
+
                                             httpC++;
-                                            packet.addHttpResponse(httpResponse);
+                                             packet.addHttpResponse(httpResponse);
                                             // System.out.println(httpResponse);
                                         }
 
@@ -192,7 +202,7 @@ public class PacketAnalyzer {
                                             Dns dns = ProtocolParser.recognizeDns(udp.getUdpData());
 
                                             if(dns.isMatched()){
-
+                                                
                                                 dnsC++;
                                                 packet.addDns(dns);
                                                 // System.out.println(dns); 
@@ -210,7 +220,6 @@ public class PacketAnalyzer {
                                     if(icmp.isMatched()){
 
                                         icmpC++;
-
                                         packet.addIcmp(icmp);
 
                                         // System.out.println(icmp);
@@ -267,18 +276,22 @@ public class PacketAnalyzer {
 
     private static Packet reassemblPacket(ArrayList<Packet> packets){
         // ArrayList<Packet> packets = packetsTmp;
+        // int intialSize = packets.size();
         Packet reassembled = new Packet();
         int currentOffset = 0;
         int i=0;
         for (Packet p: packets){
             if(p.getIpv4().getFragmentOffsetBytes()*8 == 0 && p.getIpv4().getMoreFragment() == 1){
-                reassembled = p;
+                reassembled = new Packet(p);
+                // System.out.println("Packet 2655 Ipv4 payload après dans chelou 2: \n"+packetList.get(2654).getIpv4().getPayload());
+
                 // System.out.println("Initialized with payload :\n"+reassembled.getIpv4().getPayload());
                 currentOffset += p.getIpv4().getPayloadLength();
                 packets.remove(i);
             }
             i++;
         }
+
 
         // System.out.println("Current offset after initialization : "+currentOffset);
         // System.out.println("Initalized packet id : "+reassembled.getIpv4().getIdentification());
@@ -294,8 +307,12 @@ public class PacketAnalyzer {
                     // System.out.println("Packet id testing : "+p.getIpv4().getIdentification());
 
                     if(p.getIpv4().getFragmentOffsetBytes() == currentOffset){
+
                         reassembled.setPacketData(reassembled.getPacketData()+ p.getIpv4().getPayload());
+
                         reassembled.getIpv4().setPayload(reassembled.getIpv4().getPayload() + p.getIpv4().getPayload());
+                        // System.out.println("Packet 2655 Ipv4 payload dans appel chelou : \n"+packetList.get(2654).getIpv4().getPayload());
+
                         // System.out.println("New reassembled payload :\n"+reassembled.getIpv4().getPayload());
                         currentOffset += p.getIpv4().getPayloadLength();
                         todelete = i;
@@ -310,15 +327,61 @@ public class PacketAnalyzer {
         return reassembled;
     }
 
+    private static boolean parseFilter(String arg, Packet p){
+
+        if(p == null){
+            return false;
+        }
+
+        switch(arg.toLowerCase()){
+            case "eth":
+                return p.getEth().isMatched();
+
+            case "arp":
+                return p.getArp().isMatched();
+
+            case "ip":
+                return p.getIpv4().isMatched();
+
+            case "tcp":
+                return p.getTcp().isMatched();
+
+            case "udp":
+                return p.getUdp().isMatched();
+
+            case "icmp":
+                return p.getIcmp().isMatched();
+
+            case "dhcp":
+                return p.getDhcp().isMatched();
+
+            case "ftp":
+                return p.getFtp().isMatched() || p.getFtpData().isMatched();
+
+            case "dns":
+                return p.getDns().isMatched();
+
+            case "http":
+                return p.getHttpRequest().isMatched() || p.getHttpResponse().isMatched();
+
+            default:
+                return true;
+        }
+    }
+
+    private static Packet checkForReassembled(Packet p){
+        return reassembledPackets.get(p.getIpv4().getIdentification());
+    }
+
     public static void main(String[] args){
 
-        PcapReader pcapReader = new PcapReader("dns_cap.pcap");
+        PcapReader pcapReader = new PcapReader(args[0]);
 
         Map<String, Object> globalHeaders = pcapReader.getFileHeaders();
 
-        ArrayList<Packet> packetList = pcapReader.getPacketList();
+        packetList = pcapReader.getPacketList();
 
-        Hashtable<String, Packet> reassembledPackets = new Hashtable<String, Packet>();
+        reassembledPackets = new Hashtable<String, Packet>();
 
         System.out.println("File headers\n");
         System.out.println(globalHeaders+"\n");
@@ -333,21 +396,27 @@ public class PacketAnalyzer {
                 Packet packet = parsePacketProtocols(globalHeaders, packetList.get(packetCounter), false);
 
 
-                if(2653 <= packetCounter && packetCounter <= 2656)
-                    System.out.println("Packet "+(packetCounter+1)+"\nIpv4 payload : "+packet.getIpv4().getPayload());
+                if(packet.getIpv4().isMatched() /*&& !packet.getIpv4().getIdentification().equals("0000")*/){
+                    if(packetsById.putIfAbsent(packet.getIpv4().getIdentification(), new ArrayList<Packet>(Arrays.asList(new Packet[] {new Packet(packet)}))) != null){
 
+                        // System.out.println("Testing timestamps for packet "+(packetCounter+1));
+                        int current = (Integer) packet.getPacketHeaders().get("ts_sec");
+                        int fromHT = (Integer) packetsById.get(packet.getIpv4().getIdentification()).get(0).getPacketHeaders().get("ts_sec");
+                        // System.out.println("Current : "+current);
+                        // System.out.println("From hashtable : "+fromHT);
+                        // System.out.println("Equality test : "+ (current == fromHT));
 
-                if(packet.getIpv4().isMatched() && !packet.getIpv4().getIdentification().equals("0000")){
-                    if(packetsById.putIfAbsent(packet.getIpv4().getIdentification(), new ArrayList<Packet>(Arrays.asList(new Packet[] {packet}))) != null){
-                    
-                        ArrayList<Packet> tmp = packetsById.get(packet.getIpv4().getIdentification());
-                        tmp.add(packet);
-                        packetsById.put(packet.getIpv4().getIdentification(), tmp);
+                        // If the packet has the same timestamp, we consider that it's not a coincidence that the packets has the same IP id.
+                        if(current == fromHT){
+                            ArrayList<Packet> tmp = packetsById.get(packet.getIpv4().getIdentification());
+                            tmp.add(new Packet(packet));
+                            packetsById.put(packet.getIpv4().getIdentification(), tmp);
+                        }
                     }
                 }
 
-                if(2653 <= packetCounter && packetCounter <= 2656)
-                    System.out.println("Setting packet "+(packetCounter+1)+"\nIpv4 payload : "+packet.getIpv4().getPayload());
+                // if(2653 <= packetCounter && packetCounter <= 2656)
+                    // System.out.println("Setting packet "+(packetCounter+1)+"\nIpv4 payload : "+packet.getIpv4().getPayload());
                 packetList.set(packetCounter, packet);
 
             }
@@ -361,98 +430,71 @@ public class PacketAnalyzer {
         int count = 1;
         for (Map.Entry<String, ArrayList<Packet>> e : packetsById.entrySet()){
             if(e.getValue().size() > 1){
-                System.out.println("\nTREATING "+e.getKey()+"\n");
-                System.out.println("Fragmented packets : "+e.getValue().size());
-                // System.out.println("Packet 2656 Ipv4 payload before printing : \n"+packetList.get(2655).getIpv4().getPayload());
-                // System.out.println("\nEntry "+count+" :\n\t"+Integer.parseInt(e.getKey(), 16)+" "+e.getValue().size());
-                // System.out.println("Frags for id "+e.getKey()+" : "+e.getValue());
 
-                System.out.println("Packet 2655 Ipv4 payload debug sa mère : \n"+packetList.get(2654).getIpv4().getPayload());
-
-                // Ce truc set un payload wtf
                 Packet reassembledPacket = reassemblPacket((ArrayList<Packet>) e.getValue().clone());
-                System.out.println("Packet 2655 Ipv4 payload debug sa mère 2: \n"+packetList.get(2654).getIpv4().getPayload());
-                System.out.println("Reassembled packet Ipv4 payload debug sa mère : \n"+reassembledPacket.getIpv4().getPayload());
 
-                // System.out.println("Frags after reassembling for id "+e.getKey()+" : "+e.getValue());
                 if(!reassembledPacket.getPacketData().equals("")){
-                    // reassembledPacket.getIpv4().setIntFragmentOffset(0);
-                    // System.out.println("More fragment before modif : "+reassembledPacket.getIpv4().getMoreFragment());
-                    // reassembledPacket.getIpv4().setMoreFragment(0);
-                    // System.out.println("More fragment after modif : "+reassembledPacket.getIpv4().getMoreFragment());
-                    // System.out.println("\nPacket reassembled before inserting reassembledPackets : \n"+reassembledPacket);
-                    // System.out.println("Putting "+reassembledPacket.getIpv4().getIdentification());
+
                     reassembledPacket = parsePacketProtocols(globalHeaders, reassembledPacket, true);
 
-
-
                     reassembledPackets.put(reassembledPacket.getIpv4().getIdentification(), reassembledPacket);
+
+
                 } else {
-                    System.out.println("Onéla");
+                    // System.out.println("Onéla");
                 }
             }
             count++;
         }
-        // System.out.println("\n\n------------Reassembled packets------------");
-
-        // count = 1;
-        // for(Packet p: reassembledPackets){
-        //     System.out.println("\n\n------Packet "+count+"------");
-        //     p = parsePacketProtocols(globalHeaders, p, true);
-        //     System.out.println(p);
-        //     // System.out.println("IPv4 Payload :\n"+p.getIpv4().getPayload());
-        //     count++;
-        // }
-
 
         packetCounter=1;
         int fragmentedCursor = 0;
-        // for (Packet packet: packetList) {
-        //     if(2654 <= packetCounter && packetCounter <= 2657){
+        int printCounter = 0;
+        ArrayList<Integer> fragmentedIndexes = new ArrayList<Integer>();
+        for (Packet packet: packetList) {
 
-        //         System.out.println("\n\n------------Packet "+packetCounter+"------------");
-        //         System.out.println("IPv4 Payload of current : "+packet.getIpv4().getPayload());
-        //         ArrayList<Packet> frags = packetsById.get(packet.getIpv4().getIdentification());
-        //         System.out.println("Frags size for id "+packet.getIpv4().getIdentification()+" : "+frags.size());
-        //         if(frags != null && frags.size() > 1){
-        //             System.out.println("\n------Fragmented IP Packet "+(fragmentedCursor+1)+" of "+frags.size()+"------");
-        //             fragmentedCursor++;
-        //         }
-        //         System.out.println(packet);
+            Packet rea = checkForReassembled(packet);
 
-        //         if(frags != null && fragmentedCursor == frags.size()-1 && fragmentedCursor != 0){
-        //             System.out.println("\n------Reassembled IP Packet------");
-        //             System.out.println(reassembledPackets.get(packet.getIpv4().getIdentification()));
-        //             fragmentedCursor = 0;
-        //         }
+            if(parseFilter(args[1], packet) || parseFilter(args[1], rea)){
 
-        //         if(packet.hasDebug()){
-        //             System.out.println("\n------DEBUG------");
-        //             packet.printDebug();
-        //         }
-        //     // Afficher au bon moment le paquet réassemblé
-        //     }
-        //     packetCounter++;
-        // }
+                System.out.println("\n\n------------Packet "+packetCounter+"------------");
+                // System.out.println("IPv4 Payload of current : "+packet.getIpv4().getPayload());
+                ArrayList<Packet> frags = packetsById.get(packet.getIpv4().getIdentification());
+                // System.out.println("Frags size for id "+packet.getIpv4().getIdentification()+" : "+frags.size());
+                if(frags != null && frags.size() > 1){
+                    System.out.println("\n------Fragmented IP Packet "+(fragmentedCursor+1)+" of "+frags.size()+"------");
+                    fragmentedCursor++;
+                }
+                System.out.println(packet);
 
-        count = 1;
-        for (Map.Entry<String, ArrayList<Packet>> e : packetsById.entrySet()){
-            // if(e.getValue().size() > 1){
-                // System.out.println("\nEntry "+count+" :\n\t"+Integer.parseInt(e.getKey(), 16)+" "+e.getValue().size());
-            //     Packet reassembledPacket = reassemblPacket(e.getValue());
-            //     if(!reassembledPacket.getPacketData().equals("")){
-            //         // reassembledPacket.getIpv4().setIntFragmentOffset(0);
-            //         // System.out.println("More fragment before modif : "+reassembledPacket.getIpv4().getMoreFragment());
-            //         // reassembledPacket.getIpv4().setMoreFragment(0);
-            //         // System.out.println("More fragment after modif : "+reassembledPacket.getIpv4().getMoreFragment());
-            //         // System.out.println("\nPacket reassembled before inserting reassembledPackets : \n"+reassembledPacket);
-            //         reassembledPacket = parsePacketProtocols(globalHeaders, reassembledPacket, true);
-            //         reassembledPackets.put(reassembledPacket.getIpv4().getIdentification(), reassembledPacket);
-            //     }
-            // }
-            count++;
+                if(frags != null && fragmentedCursor == frags.size() && fragmentedCursor != 0){
+                    System.out.println("\n------Reassembled IP Packet from packet "+(packetCounter-frags.size()+1)+" to packet "+packetCounter+"------");
+                    System.out.println(rea);
+                    fragmentedIndexes.add(packetCounter);
+                    fragmentedCursor = 0;
+                }
+
+                if(packet.hasDebug()){
+                    System.out.println("\n------DEBUG------");
+                    packet.printDebug();
+                }
+                printCounter++;
+            // Afficher au bon moment le paquet réassemblé
+            }
+            packetCounter++;
         }
-        
+
+        System.out.println("\n\n------------SUMMARY------------");
+
+        System.out.println(""+printCounter+" packets displayed from "+args[0]+" with filter \""+args[1]+"\"\n");
+
+        if(!fragmentedIndexes.isEmpty()){
+            System.out.println("\n\n"+fragmentedIndexes.size()+" Packets reassembled from IP fragmentation, see them at :");
+            for (Integer i: fragmentedIndexes){
+                System.out.println("\tPacket "+i);
+            }
+        }
         System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC+"\nHTTP : "+httpC);
+
     }
 }

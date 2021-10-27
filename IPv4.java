@@ -63,8 +63,32 @@ public class IPv4 {
         this.isMatched = false;
     }
 
+    public IPv4(IPv4 ipv4){
+        this.headerLength = ipv4.getHeaderLength();
+        this.headerLengthBytes = ipv4.getHeaderLengthBytes();
+        this.ds = ipv4.getDs();
+        this.totalLength = ipv4.getTotalLength();
+        this.identification = ipv4.getIdentification();
+        this.flags = ipv4.getFlags();
+        this.fragmentOffset = ipv4.getFragmentOffset();
+        this.ttl = ipv4.getTtl();
+        this.protocol = ipv4.getProtocol();
+        this.headerChecksum = ipv4.getHeaderChecksum();
+        this.sourceAdress = ipv4.getSourceAddress();
+        this.destinationAdress = ipv4.getDestinationAddress();
+        this.options = ipv4.getOptions();
+        this.ipv4Headers = ipv4.getIpv4Headers();
+        this.isMatched = ipv4.isMatched();
+        this.payload = ipv4.getPayload();
+    
+        this.dontFragment = ipv4.getDontFragment();
+        this.moreFragment = ipv4.getMoreFragment();
+        this.intFragmentOffset = ipv4.getIntFragmentOffset();
+    }
+
     public String toString(){
-        return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+intFragmentOffset+"\nFragmentOffset String : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
+        return "------IPv4------\nTransport protocol : "+resolveTransportProtocol()+" ("+protocol+")\n\nIP : "+sourceAdress+" ---> "+destinationAdress;
+        // return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+intFragmentOffset+"\nFragmentOffset String : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 
     public boolean isMatched(){
@@ -102,7 +126,8 @@ public class IPv4 {
     }
 
     public void setPayload(String payload){
-        System.out.println("Setting payload to :\n"+payload);
+        // System.out.println("Setting payload to :\n"+payload);
+        // Thread.dumpStack();
         this.payload = payload;
     }
 
@@ -161,4 +186,106 @@ public class IPv4 {
     public String getIdentification(){
         return identification;
     }
+
+    public void setHeaderLength(int headerLength) {
+        this.headerLength = headerLength;
+    }
+
+    public void setHeaderLengthBytes(int headerLengthBytes) {
+        this.headerLengthBytes = headerLengthBytes;
+    }
+
+    public String getDs() {
+        return ds;
+    }
+
+    public void setDs(String ds) {
+        this.ds = ds;
+    }
+
+    public void setTotalLength(int totalLength) {
+        this.totalLength = totalLength;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+    public String getFlags() {
+        return flags;
+    }
+
+    public void setFlags(String flags) {
+        this.flags = flags;
+    }
+
+    public String getFragmentOffset() {
+        return fragmentOffset;
+    }
+
+    public void setFragmentOffset(String fragmentOffset) {
+        this.fragmentOffset = fragmentOffset;
+    }
+
+    public String getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(String ttl) {
+        this.ttl = ttl;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public String getHeaderChecksum() {
+        return headerChecksum;
+    }
+
+    public void setHeaderChecksum(String headerChecksum) {
+        this.headerChecksum = headerChecksum;
+    }
+
+    public String getSourceAdress() {
+        return sourceAdress;
+    }
+
+    public void setSourceAdress(String sourceAdress) {
+        this.sourceAdress = sourceAdress;
+    }
+
+    public String getDestinationAdress() {
+        return destinationAdress;
+    }
+
+    public void setDestinationAdress(String destinationAdress) {
+        this.destinationAdress = destinationAdress;
+    }
+
+    public String getOptions() {
+        return options;
+    }
+
+    public void setOptions(String options) {
+        this.options = options;
+    }
+
+    public void setIpv4Headers(String ipv4Headers) {
+        this.ipv4Headers = ipv4Headers;
+    }
+
+    public void setMatched(boolean isMatched) {
+        this.isMatched = isMatched;
+    }
+
+    public void setDontFragment(int dontFragment) {
+        this.dontFragment = dontFragment;
+    }
+
+    
 }
