@@ -32,7 +32,6 @@ public class Ftp {
     }
 
     public String toString(){
-        String s = (responseCode != 0) ? "Response code : "+responseCode : "Command : "+command;
-        return "------FTP------\n" +s+ "\nArg : "+arg;
+        return "------FTP------\n" +((responseCode != 0) ? "Response code : "+responseCode : "Command : "+command) + "\nArg : "+arg;
     }
 }

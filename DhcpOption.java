@@ -13,6 +13,14 @@ public class DhcpOption {
         this.optionValue = optionValue;
     }
 
+    public String getOptionCodeHuman(){
+        return optionCodeHuman;
+    }
+
+    public String getReprOptionValue(){
+        return reprOptionValue;
+    }
+
     public int getOptionCode() {
         return optionCode;
     }
@@ -40,7 +48,7 @@ public class DhcpOption {
     private String resolveOptionCode(int optionCode, String optionValue){
         switch(optionCode){
             case 3:
-                this.reprOptionValue = "Gateway IP : "+ProtocolParser.ipv4HexaToHuman(optionValue);
+                this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
                 return "Gateway";
             case 19:
                 this.reprOptionValue = (Integer.parseInt(optionValue, 16) == 1) ? "Enable" : "Disable" + "IP Forwarding";
@@ -52,49 +60,52 @@ public class DhcpOption {
                 this.reprOptionValue = (optionValue.substring(0, 2) == "01") ? "Ethernet : " : "" + optionValue.substring(2);
                 return "Client identifier";
             case 50:
-                this.reprOptionValue = "Requested IP : "+ProtocolParser.ipv4HexaToHuman(optionValue);
+                this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
                 return "Requested IP";
             case 53:
                 this.reprOptionValue = "Message type : ";
                 switch(Integer.parseInt(optionValue, 16)){
                     case 1:
-                        this.reprOptionValue += "DHCPDISCOVER";
+                        this.reprOptionValue += "DHCP DISCOVER";
                         break;
                     case 2:
-                        this.reprOptionValue += "DHCPOFFER";
+                        this.reprOptionValue += "DHCP OFFER";
                         break;
                     case 3:
-                        this.reprOptionValue += "DHCPREQUEST";
+                        this.reprOptionValue += "DHCP REQUEST";
                         break;
                     case 4:
-                        this.reprOptionValue += "DHCPDECLINE";
+                        this.reprOptionValue += "DHCP DECLINE";
                         break;
                     case 5:
-                        this.reprOptionValue += "DHCPACK";
+                        this.reprOptionValue += "DHCP ACK";
                         break;
                     case 6:
-                        this.reprOptionValue += "DHCPNAK";
+                        this.reprOptionValue += "DHCP NAK";
                         break;
                     case 7:
-                        this.reprOptionValue += "DHCPRELEASE";
+                        this.reprOptionValue += "DHCP RELEASE";
                         break;
                     case 8:
-                        this.reprOptionValue += "DHCPINFORM";
+                        this.reprOptionValue += "DHCP INFORM";
                         break;
                 }
                 return "Message type";
             case 12:
-                this.reprOptionValue = "Hostname : "+ProtocolParser.hexaToAscii(optionValue);
+                this.reprOptionValue = ""+ProtocolParser.hexaToAscii(optionValue);
                 return "Hostname";
             case 1:
-                this.reprOptionValue = "Subnet mask : "+ProtocolParser.ipv4HexaToHuman(optionValue);
+                this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
                 return "Subnet mask";
             case 6:
-                this.reprOptionValue = "Domain name server : "+ProtocolParser.ipv4HexaToHuman(optionValue);
+                this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
                 return "Domain name server";
             case 51:
-                this.reprOptionValue = "IP address lease time : "+Integer.parseInt(optionValue, 16)+"s";
+                this.reprOptionValue = ""+Integer.parseInt(optionValue, 16)+"s";
                 return "IP address lease time";
+            case 54:
+                this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
+                return "DHCP Server identifier";
             default:
                 this.reprOptionValue = "";
                 return "";

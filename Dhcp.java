@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Dhcp {
 
@@ -17,7 +18,7 @@ public class Dhcp {
     private String clientMac;
     private String serverHostName;
     private String bootFile;
-    private ArrayList<DhcpOption> options;
+    private Hashtable<Integer, DhcpOption> options;
     private boolean isMatched;
 
     public Dhcp(int opcode, int htype, int hlen, int hops, String transacId, int secondElapsed, String flags,
@@ -34,7 +35,7 @@ public class Dhcp {
         this.yourClientIp = yourClientIp;
         this.nextServerIp = nextServerIp;
         this.gatewayIp = gatewayIp;
-        this.clientMac = clientMac.substring(0, hlen*2);
+        this.clientMac = ProtocolParser.toPrettyMac(clientMac.substring(0, hlen*2));
         this.serverHostName = serverHostName;
         this.bootFile = bootFile;
         this.isMatched = true;
@@ -63,7 +64,7 @@ public class Dhcp {
 
     private void parseOptions(String optionsString){
 
-        this.options = new ArrayList<DhcpOption>();
+        this.options = new Hashtable<Integer, DhcpOption>();
 
         int localCursor = 0;
 
@@ -75,10 +76,10 @@ public class Dhcp {
             // Put {optionCode, optionValue} in options dictionary
             int optionLength = Integer.parseInt(optionsString.substring(localCursor, localCursor+=2),16);
             String optionValue = optionsString.substring(localCursor, localCursor += optionLength*2);
-            options.add(new DhcpOption(optionCode, optionLength, optionValue));
+            options.put(optionCode, new DhcpOption(optionCode, optionLength, optionValue));
         }
 
-        options.add(new DhcpOption(255, 0, ""));
+        options.put(255, new DhcpOption(255, 0, ""));
         
     }
 
@@ -104,12 +105,33 @@ public class Dhcp {
 
     public String toString(){
         String optionsString = "";
-        for (DhcpOption dhcpOption : options) {
-            optionsString += dhcpOption.toString();
-        }
+        String dhcpMessageType = "\n";
         String descr = "";
+        // for (DhcpOption dhcpOption : options) {
+        // if(dhcpOption.getOptionCode() == 53){
+        DhcpOption msgType = options.get(53);
+        switch(Integer.parseInt(msgType.getOptionValue(), 16)){
+            case 1:
+                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nClient "+clientMac+" is discovering"/*"\nTransaction id : "+transacId*/;
+                break;
+            case 2:
+                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nServer "+nextServerIp+" is offering to "+clientMac+" :\n\tIP : "+yourClientIp+"\n\tSUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\tDomain name server : "+options.get(6).getReprOptionValue())+"\n"+(!gatewayIp.equals("0.0.0.0") ? " (DHCP relay : "+gatewayIp+")" : "");
+                break;
+            case 3:
+                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nClient "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" is requesting "+(options.get(50) == null ? ""+clientIp : options.get(50).getReprOptionValue())+(options.get(54) == null ? "" : " to DHCP server "+options.get(54).getReprOptionValue());
+                break;
+            case 5:
+                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nServer "+options.get(54).getReprOptionValue()+" is acknowledging configuration for "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" :\n\tIP : "+yourClientIp+"\n\tSUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\tDomain name server : "+options.get(6).getReprOptionValue());
+                break;
+            default:
+                break;
+            
+        }
+        // }
+            // optionsString += dhcpOption.toString();
+        // }
         // switch(options.)
-        return "------DHCP------\nBoot Opcode : "+getOpCodeHuman();
+        return "------DHCP------\nBoot Opcode : "+getOpCodeHuman()+descr;
         // return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
         // ")\nHardware type : "+htype+
         // "\nHarware Len : "+hlen+

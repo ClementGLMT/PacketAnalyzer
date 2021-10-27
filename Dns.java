@@ -108,7 +108,7 @@ public class Dns {
     }
 
     public String toString(){
-        return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+"\nFlags : "+flags+"\nQuestion : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
+        return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+"\nFlags : "+flags+"\nQuestions : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
     }
 
     public String getQuestions(){

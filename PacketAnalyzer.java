@@ -375,6 +375,18 @@ public class PacketAnalyzer {
 
     public static void main(String[] args){
 
+        ArrayList<String> arguments = new ArrayList<String>(Arrays.asList(args));
+
+        if(arguments.size() == 0){
+            System.out.println("Please enter a file name to analyze it's packets");
+            System.exit(1);
+        }
+
+        if(arguments.size() == 1){
+            System.out.println("No display filter given, all packets will be printed");
+            arguments.add("lalilalou");
+        }
+
         PcapReader pcapReader = new PcapReader(args[0]);
 
         Map<String, Object> globalHeaders = pcapReader.getFileHeaders();
@@ -451,11 +463,12 @@ public class PacketAnalyzer {
         int fragmentedCursor = 0;
         int printCounter = 0;
         ArrayList<Integer> fragmentedIndexes = new ArrayList<Integer>();
+
         for (Packet packet: packetList) {
 
             Packet rea = checkForReassembled(packet);
 
-            if(parseFilter(args[1], packet) || parseFilter(args[1], rea)){
+            if(parseFilter(arguments.get(1), packet) || parseFilter(arguments.get(1), rea)){
 
                 System.out.println("\n\n------------Packet "+packetCounter+"------------");
                 // System.out.println("IPv4 Payload of current : "+packet.getIpv4().getPayload());
@@ -486,7 +499,7 @@ public class PacketAnalyzer {
 
         System.out.println("\n\n------------SUMMARY------------");
 
-        System.out.println(""+printCounter+" packets displayed from "+args[0]+" with filter \""+args[1]+"\"\n");
+        System.out.println(""+printCounter+" packets displayed from "+arguments.get(0)+" with filter \""+arguments.get(1)+"\"\n");
 
         if(!fragmentedIndexes.isEmpty()){
             System.out.println("\n\n"+fragmentedIndexes.size()+" Packets reassembled from IP fragmentation, see them at :");
