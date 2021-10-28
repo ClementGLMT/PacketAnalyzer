@@ -495,7 +495,7 @@ public class PacketAnalyzer {
             packetCounter++;
         }
 
-        System.out.println("\n\n------------------------------------SUMMARY------------------------------------");
+        System.out.println("\n\n------------------------------------SUMMARY------------------------------------\n");
 
         System.out.println(""+printCounter+" packets displayed from "+arguments.get(0)+" with "+(arguments.get(1).equals("") ? "no filter" : "filter \""+arguments.get(1)+"\"\n"));
 
@@ -505,7 +505,7 @@ public class PacketAnalyzer {
                 System.out.println("\tPacket "+i);
             }
         }
-        System.out.println("\n\nCounters : \nEthernet : "+ethC+"\nArp : "+arpC+"\nIPv4 : "+ipv4C+"\nUDP : "+udpC+"\nICMP : "+icmpC+"\nTCP : "+tcpC+"\nDNS : "+dnsC+"\nFTP : "+ftpC+"\nFTP-DATA : "+ftpDataC+"\nDHCP : "+dhcpC+"\nHTTP : "+httpC);
+        System.out.println("\n\nPackets treated : "+(packetCounter-1)+", including\n\n\t- Ethernet : "+ethC+"\n\t- Arp : "+arpC+"\n\t- IPv4 : "+ipv4C+"\n\t- UDP : "+udpC+"\n\t- ICMP : "+icmpC+"\n\t- TCP : "+tcpC+"\n\t- DNS : "+dnsC+"\n\t- FTP : "+ftpC+"\n\t- FTP-DATA : "+ftpDataC+"\n\t- DHCP : "+dhcpC+"\n\t- HTTP : "+httpC+"\n");
 
     }
 }

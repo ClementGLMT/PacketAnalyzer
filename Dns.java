@@ -108,7 +108,7 @@ public class Dns {
     }
 
     public String toString(){
-        return ""+getQueryOrResponse()+"\nTransaction ID : "+Integer.parseInt(transactionId, 16)+/*"\nFlags : "+flags+*/"\nQuestions : "+Integer.parseInt(questions, 16)+"\nAnswerRRs : "+Integer.parseInt(answerRRs, 16)+"\nAuthority RRs : "+Integer.parseInt(authorityRRs, 16)+"\nAdditional RRs : "+Integer.parseInt(additionalRRs, 16)+getQuestions()+getAnswers();
+        return ""+getQueryOrResponse()+"\nTransaction ID : "+Integer.parseInt(transactionId, 16)+/*"\nFlags : "+flags+*/"\n\nQuestions : "+Integer.parseInt(questions, 16)+"\nAnswerRRs : "+Integer.parseInt(answerRRs, 16)+"\nAuthority RRs : "+Integer.parseInt(authorityRRs, 16)+"\nAdditional RRs : "+Integer.parseInt(additionalRRs, 16)+getQuestions()+getAnswers();
         // return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+/*"\nFlags : "+flags+*/"\nQuestions : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
     }
 

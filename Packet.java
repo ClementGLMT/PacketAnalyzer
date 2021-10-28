@@ -306,14 +306,66 @@ public class Packet {
     }
 
     public String summary(){
-        String r = "";
+
+        String protosSummary = "";
+
+        if(eth.isMatched()){
+            protosSummary += "[ETHERNET] / ";
+        }
+        if(arp.isMatched()){
+            protosSummary += "[ARP] / ";
+        }
+
+        if(ipv4.isMatched()){
+            protosSummary += "[IPv4] / ";
+        }
+
+        if(tcp.isMatched()){
+            protosSummary += "[TCP] / ";
+        }
+
+        if(udp.isMatched()){
+            protosSummary += "[UDP] / ";
+        }
+
+        if(icmp.isMatched()){
+            protosSummary += "[ICMP] / ";
+        }
+
+        if(dns.isMatched()){
+            protosSummary += "[DNS] / ";
+        }
+
+        if(dhcp.isMatched()){
+            protosSummary += "[DHCP] / ";
+        }
+
+        if(ftp.isMatched()){
+            protosSummary += "[FTP] / ";
+        }
+
+        if(ftpData.isMatched()){
+            protosSummary += "[FTP-DATA] / ";
+        }
+
+        if(httpRequest.isMatched() || httpResponse.isMatched()){
+            protosSummary += "[HTTP] / ";
+        }
+
+        protosSummary = protosSummary.substring(0, protosSummary.length()-3);
+
+        String r = "\n" + protosSummary+"\n\n";
+
+        if(/*!arp.isMatched() && */!ipv4.isMatched() && !tcp.isMatched() && !udp.isMatched() && !icmp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
+            r += "\n"+eth.toString();
+        }
 
         if(arp.isMatched()){
-            r += "\n"+arp.toString();
+            r += "\n\n"+arp.toString();
 
-            if(eth.isMatched()){
-                r += "\n"+eth.toString();
-            }
+            // if(eth.isMatched()){
+            //     r += "\n"+eth.toString();
+            // }
         } else {
             if(ipv4.isMatched()){
 
@@ -344,14 +396,14 @@ public class Packet {
                 }
 
                 if(httpRequest.isMatched()){
-                    r += "\n"+httpRequest.toString();
+                    r += "\n\n"+httpRequest.toString();
                 }
 
                 if(httpResponse.isMatched()){
-                    r += "\n"+httpResponse.toString();
+                    r += "\n\n"+httpResponse.toString();
                 }
 
-                if(!tcp.isMatched() && !udp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
+                if(!tcp.isMatched() && !udp.isMatched() && !icmp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
                     r += "\n"+ipv4.toString();
                     r += "\n"+eth.toString();
                 }
