@@ -137,6 +137,30 @@ public class PacketAnalyzer {
   
                                             packet.addFtp(ftp);
                                         }
+
+                                        // Trying to recognize DNS
+                                        if(tcp.getDestinationPort() == 53 ||  tcp.getSourcePort() == 53){
+
+                                            // packetList.set(i, packetList.get(i).addDebug("Matched on : "+udp.getUdpData()));
+                                            // packetList.set(i, packetList.get(i).addDebug("Size : "+Integer.parseInt(m.group(1), 16)*2));
+                                            // packetList.set(i, packetList.get(i).addDebug("Length du bousin : "+m.group(2).length()));
+
+                                            // System.out.println("DNS matched");
+                                            // System.out.println("Size : "+Integer.parseInt(m.group(1), 16));
+                                            // System.out.println("Length du bousin : "+m.group(2).length());
+                                                // System.out.println("DNS matched and checked");
+
+                                            if(!tcp.getPayload().equals("")){
+                                                Dns dns = ProtocolParser.recognizeDns(tcp.getPayload().substring(4));
+
+                                                if(dns.isMatched()){
+                                                    
+                                                    dnsC++;
+                                                    packet.addDns(dns);
+                                                    // System.out.println(dns); 
+                                                }
+                                            }
+                                        }
                                     }
 
                                     break;
