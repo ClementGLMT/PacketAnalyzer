@@ -305,6 +305,72 @@ public class Packet {
         this.debug = debug;
     }
 
+    public String summary(){
+        String r = "";
+
+        if(arp.isMatched()){
+            r += "\n"+arp.toString();
+
+            if(eth.isMatched()){
+                r += "\n"+eth.toString();
+            }
+        } else {
+            if(ipv4.isMatched()){
+
+                if(tcp.isMatched()){
+                    r += "\n"+tcp.toString();
+                    r += "\nTCP over IPv4 : "+ipv4.getSourceAddress()+":"+tcp.getSourcePort()+" ----> "+ipv4.getDestinationAddress()+":"+tcp.getDestinationPort();
+                }
+        
+                if(udp.isMatched()){
+                    r += "\nUDP over IPv4 : "+ipv4.getSourceAddress()+":"+udp.getSourcePort()+" ----> "+ipv4.getDestinationAddress()+":"+udp.getDestPort() +(ipv4.getDestinationAddress().equals("255.255.255.255") ? " (Broadcast)" : "");
+                    r += "\n"+udp.toString();
+                }
+
+                if(dns.isMatched()){
+                    r += "\n\n"+dns.toString();
+                }
+
+                if(dhcp.isMatched()){
+                    r += "\n\n"+dhcp.toString();
+                }
+
+                if(ftp.isMatched()){
+                    r += "\n\n"+ftp.toString();
+                }
+
+                if(ftpData.isMatched()){
+                    r += "\n\n"+ftpData.toString();
+                }
+
+                if(httpRequest.isMatched()){
+                    r += "\n"+httpRequest.toString();
+                }
+
+                if(httpResponse.isMatched()){
+                    r += "\n"+httpResponse.toString();
+                }
+
+                if(!tcp.isMatched() && !udp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
+                    r += "\n"+ipv4.toString();
+                    r += "\n"+eth.toString();
+                }
+
+                // ICMP c'est good
+                if(icmp.isMatched()){
+                    r += "\n"+icmp.toString();
+                    r += "\n\n"+ipv4.toString();
+                    if(eth.isMatched()){
+                        r += "\n"+eth.toString();
+                    }
+                } 
+            }
+
+        }
+
+        return r;
+    }
+
     public String toString(){
         String r = "";
 

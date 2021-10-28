@@ -52,7 +52,7 @@ public class FtpData {
     }
 
     public String toString(){
-        return "------FTP-DATA------\n"+ipClient+" Downloading from "+ip+":"+port;
+        return "FTP DATA\n"+ipClient+" Downloading data from "+ip+":"+port;
     }
 
 }

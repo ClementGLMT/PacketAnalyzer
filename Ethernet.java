@@ -57,7 +57,8 @@ public class Ethernet {
     }
 
     public String toString(){
-        return "------ETHERNET------\nMAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
+        return "MAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
+        // return "------ETHERNET------\nMAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
     }
     
 }

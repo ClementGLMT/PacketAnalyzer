@@ -384,7 +384,7 @@ public class PacketAnalyzer {
 
         if(arguments.size() == 1){
             System.out.println("No display filter given, all packets will be printed");
-            arguments.add("lalilalou");
+            arguments.add("");
         }
 
         PcapReader pcapReader = new PcapReader(args[0]);
@@ -452,9 +452,7 @@ public class PacketAnalyzer {
                     reassembledPackets.put(reassembledPacket.getIpv4().getIdentification(), reassembledPacket);
 
 
-                } else {
-                    // System.out.println("Onéla");
-                }
+                } 
             }
             count++;
         }
@@ -470,7 +468,7 @@ public class PacketAnalyzer {
 
             if(parseFilter(arguments.get(1), packet) || parseFilter(arguments.get(1), rea)){
 
-                System.out.println("\n\n------------Packet "+packetCounter+"------------");
+                System.out.println("\n\n------------------------------------Packet "+packetCounter+"------------------------------------");
                 // System.out.println("IPv4 Payload of current : "+packet.getIpv4().getPayload());
                 ArrayList<Packet> frags = packetsById.get(packet.getIpv4().getIdentification());
                 // System.out.println("Frags size for id "+packet.getIpv4().getIdentification()+" : "+frags.size());
@@ -478,11 +476,11 @@ public class PacketAnalyzer {
                     System.out.println("\n------Fragmented IP Packet "+(fragmentedCursor+1)+" of "+frags.size()+"------");
                     fragmentedCursor++;
                 }
-                System.out.println(packet);
+                System.out.println(packet.summary());
 
                 if(frags != null && fragmentedCursor == frags.size() && fragmentedCursor != 0){
                     System.out.println("\n------Reassembled IP Packet from packet "+(packetCounter-frags.size()+1)+" to packet "+packetCounter+"------");
-                    System.out.println(rea);
+                    System.out.println(rea.summary());
                     fragmentedIndexes.add(packetCounter);
                     fragmentedCursor = 0;
                 }
@@ -497,9 +495,9 @@ public class PacketAnalyzer {
             packetCounter++;
         }
 
-        System.out.println("\n\n------------SUMMARY------------");
+        System.out.println("\n\n------------------------------------SUMMARY------------------------------------");
 
-        System.out.println(""+printCounter+" packets displayed from "+arguments.get(0)+" with filter \""+arguments.get(1)+"\"\n");
+        System.out.println(""+printCounter+" packets displayed from "+arguments.get(0)+" with "+(arguments.get(1).equals("") ? "no filter" : "filter \""+arguments.get(1)+"\"\n"));
 
         if(!fragmentedIndexes.isEmpty()){
             System.out.println("\n\n"+fragmentedIndexes.size()+" Packets reassembled from IP fragmentation, see them at :");

@@ -87,7 +87,8 @@ public class IPv4 {
     }
 
     public String toString(){
-        return "------IPv4------\nTransport protocol : "+resolveTransportProtocol()+" ("+protocol+")\n\nIP : "+sourceAdress+" ---> "+destinationAdress;
+        return "IPv4 : "+sourceAdress+" ----> "+destinationAdress;
+        // return "------IPv4------\nTransport protocol : "+resolveTransportProtocol()+" ("+protocol+")\n\nIP : "+sourceAdress+" ---> "+destinationAdress;
         // return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+intFragmentOffset+"\nFragmentOffset String : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 

@@ -71,7 +71,8 @@ public class HttpRequest {
     }
 
     public String toString(){
-        return "------HTTP------\nMethod : "+method+"\nURI : "+uri+headersToString();
+        return "HTTP Request : "+method+" on "+uri+headersToString();
+        // return "------HTTP------\nMethod : "+method+"\nURI : "+uri+headersToString();
     }
 
     

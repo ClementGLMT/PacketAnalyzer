@@ -72,7 +72,8 @@ public class HttpResponse {
     }
 
     public String toString(){
-        return "------HTTP------\nResponse code : "+responseCode+"\nResponse reason : "+responseMsg+headersToString()+"\nHTTP Response data : \n"+httpData;
+        return "HTTP Response : "+responseCode+" "+responseMsg+headersToString()+"\nData : \n"+httpData;
+        // return "------HTTP------\nResponse code : "+responseCode+"\nResponse reason : "+responseMsg+headersToString()+"\nHTTP Response data : \n"+httpData;
     }
     
 }

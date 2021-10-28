@@ -32,6 +32,20 @@ public class Ftp {
     }
 
     public String toString(){
-        return "------FTP------\n" +((responseCode != 0) ? "Response code : "+responseCode : "Command : "+command) + "\nArg : "+arg;
+        String r = "";
+        String r2 = "";
+
+        if(responseCode == 227){
+            FtpData ftpData = ProtocolParser.getFtpPassiveInfo(arg, "");
+            r2 += "Entering passive mode : Download at "+ftpData.getIp()+":"+ftpData.getPort();
+        }
+
+        if(responseCode == 0){
+            r += "FTP Command\n"+command+(arg.equals("") ? "" : " : "+arg);
+        } else {
+            r += "FTP Response\n"+responseCode+(arg.equals("") ? "" : " : "+(r2.equals("") ? ""+arg : r2));
+        }
+
+        return r;
     }
 }

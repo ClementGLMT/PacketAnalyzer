@@ -63,7 +63,7 @@ public class DhcpOption {
                 this.reprOptionValue = ""+ProtocolParser.ipv4HexaToHuman(optionValue);
                 return "Requested IP";
             case 53:
-                this.reprOptionValue = "Message type : ";
+                this.reprOptionValue = "";
                 switch(Integer.parseInt(optionValue, 16)){
                     case 1:
                         this.reprOptionValue += "DHCP DISCOVER";

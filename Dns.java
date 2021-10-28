@@ -108,13 +108,14 @@ public class Dns {
     }
 
     public String toString(){
-        return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+"\nFlags : "+flags+"\nQuestions : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
+        return ""+getQueryOrResponse()+"\nTransaction ID : "+Integer.parseInt(transactionId, 16)+/*"\nFlags : "+flags+*/"\nQuestions : "+Integer.parseInt(questions, 16)+"\nAnswerRRs : "+Integer.parseInt(answerRRs, 16)+"\nAuthority RRs : "+Integer.parseInt(authorityRRs, 16)+"\nAdditional RRs : "+Integer.parseInt(additionalRRs, 16)+getQuestions()+getAnswers();
+        // return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+/*"\nFlags : "+flags+*/"\nQuestions : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
     }
 
     public String getQuestions(){
         String r="";
         for (int i=0; i < dnsQueries.size(); i++) {
-            r += "\nQUESTIONS : \nQuestion "+(i+1)+"\n\tName : "+dnsQueries.get(i).getName()+"\n\tType : "+dnsQueries.get(i).getTypeHuman()+"\n\tClass : "+dnsQueries.get(i).getDnsClassHuman();
+            r += "\n\nQUESTIONS : \nQuestion "+(i+1)+"\n\tName : "+dnsQueries.get(i).getName()+"\n\tType : "+dnsQueries.get(i).getTypeHuman()+"\n\tClass : "+dnsQueries.get(i).getDnsClassHuman();
         }
         return r;
     }
@@ -122,7 +123,7 @@ public class Dns {
     public String getAnswers(){
         String r="";
         for(int i=0; i < dnsResponses.size(); i++){
-            r += "\nANSWERS : \nAnswer "+(i+1)+"\n\tName : "+dnsResponses.get(i).getName()+"\n\tType : "+dnsResponses.get(i).getTypeHuman()+"\n\tClass : "+dnsResponses.get(i).getDnsClassHuman()+"\n\tTTL : "+dnsResponses.get(i).getTtl()+"\n\tResponse Length : "+dnsResponses.get(i).getDataLength()+"\n\tResponse : "+dnsResponses.get(i).getAddress();
+            r += "\n\nANSWERS : \nAnswer "+(i+1)+"\n\tName : "+dnsResponses.get(i).getName()+"\n\tType : "+dnsResponses.get(i).getTypeHuman()+"\n\tClass : "+dnsResponses.get(i).getDnsClassHuman()+"\n\tTTL : "+dnsResponses.get(i).getTtl()+"\n\tResponse Length : "+dnsResponses.get(i).getDataLength()+"\n\tResponse : "+dnsResponses.get(i).getAddress();
         }
         return r;
     }

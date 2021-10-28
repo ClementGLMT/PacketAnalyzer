@@ -112,16 +112,16 @@ public class Dhcp {
         DhcpOption msgType = options.get(53);
         switch(Integer.parseInt(msgType.getOptionValue(), 16)){
             case 1:
-                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nClient "+clientMac+" is discovering"/*"\nTransaction id : "+transacId*/;
+                descr += msgType.getReprOptionValue()+" ("+getOpCodeHuman()+")"+"\nTRANSACTION ID : "+transacId+"\n\nClient "+clientMac+" is discovering network"/*"\nTransaction id : "+transacId*/;
                 break;
             case 2:
-                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nServer "+nextServerIp+" is offering to "+clientMac+" :\n\tIP : "+yourClientIp+"\n\tSUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\tDomain name server : "+options.get(6).getReprOptionValue())+"\n"+(!gatewayIp.equals("0.0.0.0") ? " (DHCP relay : "+gatewayIp+")" : "");
+                descr += msgType.getReprOptionValue()+" ("+getOpCodeHuman()+")" +"\nTRANSACTION ID : "+transacId+"\n\nServer "+nextServerIp+" is offering to "+clientMac+" :\n\n\t- IP : "+yourClientIp+"\n\t- SUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\t- Domain name server : "+options.get(6).getReprOptionValue())+"\n"+(!gatewayIp.equals("0.0.0.0") ? " (DHCP relay : "+gatewayIp+")" : "");
                 break;
             case 3:
-                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nClient "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" is requesting "+(options.get(50) == null ? ""+clientIp : options.get(50).getReprOptionValue())+(options.get(54) == null ? "" : " to DHCP server "+options.get(54).getReprOptionValue());
+                descr += msgType.getReprOptionValue()+" ("+getOpCodeHuman()+")" +"\nTRANSACTION ID : "+transacId+"\n\nClient "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" is requesting address "+(options.get(50) == null ? ""+clientIp : options.get(50).getReprOptionValue())+(options.get(54) == null ? "" : " to DHCP server "+options.get(54).getReprOptionValue());
                 break;
             case 5:
-                descr += "\nTRANSACTION ID : "+transacId+"\n"+msgType.getReprOptionValue() + "\nServer "+options.get(54).getReprOptionValue()+" is acknowledging configuration for "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" :\n\tIP : "+yourClientIp+"\n\tSUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\tDomain name server : "+options.get(6).getReprOptionValue());
+                descr += msgType.getReprOptionValue() +" ("+getOpCodeHuman()+")"+"\nTRANSACTION ID : "+transacId+"\n\nServer "+options.get(54).getReprOptionValue()+" is acknowledging configuration for client "+clientMac+(!clientIp.equals("0.0.0.0") ? " ("+clientIp+")" : "")+" :\n\n\t- IP : "+yourClientIp+"\n\t- SUBNET MASK : "+options.get(1).getReprOptionValue()+(options.get(6) == null ? "" : "\n\t- Domain name server : "+options.get(6).getReprOptionValue());
                 break;
             default:
                 break;
@@ -131,7 +131,9 @@ public class Dhcp {
             // optionsString += dhcpOption.toString();
         // }
         // switch(options.)
-        return "------DHCP------\nBoot Opcode : "+getOpCodeHuman()+descr;
+        return descr;
+
+        // return "------DHCP------\nBoot Opcode : "+getOpCodeHuman()+descr;
         // return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
         // ")\nHardware type : "+htype+
         // "\nHarware Len : "+hlen+

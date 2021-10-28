@@ -69,7 +69,8 @@ public class Arp {
             default:
                 break;
         }
-        return "------ARP------\nLayer 3 protocol : "+ptypeHuman+"\nOpcode : "+resolveOpCode()+" ("+opcode+")\nHARDWARE : "+senderHardwareAdress+" ----> "+targetHardwareAdress+ (targetHardwareAdress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +"\n\n"+descr;
+        return "ARP "+resolveOpCode()+"\nLayer 3 protocol : "+ptypeHuman+"\nHARDWARE : "+senderHardwareAdress+" ----> "+targetHardwareAdress+ (targetHardwareAdress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +"\n\n"+descr;
+        // return "------ARP------\nLayer 3 protocol : "+ptypeHuman+"\nOpcode : "+resolveOpCode()+" ("+opcode+")\nHARDWARE : "+senderHardwareAdress+" ----> "+targetHardwareAdress+ (targetHardwareAdress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +"\n\n"+descr;
         // return "------ARP------\nProto : "+ptype+" ("+ptypeHuman+")\nOpcode : "+opcode+" ("+resolveOpCode()+")\nSender MAC @ : "+senderHardwareAdress+"\nSender Proto @ : "+senderProtocolAddress+"\nTarget MAC @ : "+targetHardwareAdress+"\nTarget Proto @ : "+targetProtocolAddress+"\n"+descr;
     }
 }
