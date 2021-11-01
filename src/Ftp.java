@@ -1,3 +1,4 @@
+package src;
 public class Ftp {
 
     private String command;

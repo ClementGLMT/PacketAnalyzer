@@ -1,3 +1,4 @@
+package src;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -73,7 +74,6 @@ public class HttpResponse {
 
     public String toString(){
         return "HTTP Response : "+responseCode+" - "+responseMsg+headersToString()+(httpData.equals("") ? "" : "\n\nData : \n\n"+httpData);
-        // return "------HTTP------\nResponse code : "+responseCode+"\nResponse reason : "+responseMsg+headersToString()+"\nHTTP Response data : \n"+httpData;
     }
     
 }

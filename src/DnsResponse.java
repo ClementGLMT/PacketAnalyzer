@@ -1,3 +1,4 @@
+package src;
 public class DnsResponse {
 
     private String name;

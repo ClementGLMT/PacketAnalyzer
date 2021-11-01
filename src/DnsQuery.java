@@ -1,3 +1,4 @@
+package src;
 public class DnsQuery {
 
     private String name;

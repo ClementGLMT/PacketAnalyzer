@@ -1,3 +1,4 @@
+package src;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -356,16 +357,13 @@ public class Packet {
 
         String r = "\n" + protosSummary+"\n\n";
 
-        if(/*!arp.isMatched() && */!ipv4.isMatched() && !tcp.isMatched() && !udp.isMatched() && !icmp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
+        if(!ipv4.isMatched() && !tcp.isMatched() && !udp.isMatched() && !icmp.isMatched() && !dns.isMatched() && !dhcp.isMatched() && !ftp.isMatched() && !ftpData.isMatched() && !httpRequest.isMatched() && !httpResponse.isMatched()){
             r += "\n"+eth.toString();
         }
 
         if(arp.isMatched()){
             r += "\n\n"+arp.toString();
 
-            // if(eth.isMatched()){
-            //     r += "\n"+eth.toString();
-            // }
         } else {
             if(ipv4.isMatched()){
 
@@ -455,8 +453,6 @@ public class Packet {
             r += "\n\n"+httpResponse.toString();
 
         return r;
-
-        // return "\n\nHEADERS : " + this.packetHeaders + "\nDATA : " + this.packetData+r;
     }
 
 }

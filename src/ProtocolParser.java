@@ -1,3 +1,4 @@
+package src;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Map;
@@ -42,8 +43,6 @@ public class ProtocolParser {
     public static IPv4 recognizeIPv4(String packetData, int length){
         String ipv4Pattern = "4([5-9a-fA-F])([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{4})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{0,40})";
 
-        // @todo debug options;
-
         String ipv4Headers = packetData.substring(0, length*8);
 
         Pattern r = Pattern.compile(ipv4Pattern);
@@ -71,12 +70,6 @@ public class ProtocolParser {
         Matcher m = r.matcher(udpHeaders);
 
         boolean result = m.find();
-
-        // System.out.println("UDP Source port : "+Integer.parseInt(m.group(1), 16));
-        // System.out.println("UDP dest port : "+Integer.parseInt(m.group(2), 16));
-        // System.out.println("UDP Data length : "+Integer.parseInt(m.group(3), 16));
-        // System.out.println("Udp Data without headers : \n"+packetData.substring(16));
-        // System.out.println("Udp data without header length in Bytes : "+packetData.substring(16).length()/2);
 
         if(result){
 
@@ -181,18 +174,12 @@ public class ProtocolParser {
 
     public static Ftp recognizeFtp(String packetDataAscii){
 
-        // System.out.println("Packet data : "+packetDataAscii);
-        // System.out.println("Packet data length : "+packetDataAscii.length());
-
-
         // Building regex for matching a command
         String ftpCommands = "";
         for (FtpCommands ftpcom : java.util.Arrays.asList(FtpCommands.values())) {
             ftpCommands += ftpcom.toString()+"|";
         }
         String ftpPattern = "^("+ftpCommands.substring(0, ftpCommands.length()-1)+") ?([ -~]*)?\r\n";
-
-        // System.out.println(ftpPattern);
 
         // Building a regex for matching a response
         String ftpReplyCodes = "";
@@ -208,7 +195,6 @@ public class ProtocolParser {
 
         // If a command is matched
         if(result){
-            // System.out.println("Command match");
             Ftp ftpCom = new Ftp(m.group(1), m.group(2), 0);
             return ftpCom;
         } else {
@@ -219,9 +205,6 @@ public class ProtocolParser {
             result = m.find();
 
             if(result){
-                // System.out.println("Group 1 : "+m.group(1));
-                // System.out.println("Group 2 : "+m.group(2));
-                // System.out.println("Group 2 : "+m.group(3));
 
                 Ftp ftpResp = new Ftp("", m.group(3),Integer.parseInt(m.group(1).substring(0, m.group(1).length()-1)));
                 return ftpResp;

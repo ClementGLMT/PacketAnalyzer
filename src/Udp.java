@@ -1,3 +1,4 @@
+package src;
 public class Udp {
 
     private int sourcePort;
@@ -35,7 +36,6 @@ public class Udp {
 
     public String toString(){
         return ""+length+" Bytes payload";
-        // return "------UDP------\nPayload length : "+length+"\n\nPORTS : "+sourcePort+" ----> "+destinationPort;
     }
 
     public String getUdpHeaders(){

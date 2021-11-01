@@ -1,3 +1,4 @@
+package src;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -109,7 +110,6 @@ public class Dns {
 
     public String toString(){
         return ""+getQueryOrResponse()+"\nTransaction ID : "+Integer.parseInt(transactionId, 16)+/*"\nFlags : "+flags+*/"\n\nQuestions : "+Integer.parseInt(questions, 16)+"\nAnswerRRs : "+Integer.parseInt(answerRRs, 16)+"\nAuthority RRs : "+Integer.parseInt(authorityRRs, 16)+"\nAdditional RRs : "+Integer.parseInt(additionalRRs, 16)+getQuestions()+getAnswers();
-        // return "------DNS------\nType : "+getQueryOrResponse()+"\nTransaction ID : "+transactionId+/*"\nFlags : "+flags+*/"\nQuestions : "+questions+"\nAnswerRRs : "+answerRRs+"\nAuthority RRs : "+authorityRRs+"\nAdditional RRs : "+additionalRRs+getQuestions()+getAnswers();
     }
 
     public String getQuestions(){
@@ -142,8 +142,6 @@ public class Dns {
 
         finished = false;
 
-        // System.out.println("Data from readDomain : "+dnsData.substring(cursor));
-
         while(!((domain = readWord(dnsData.substring(cursor))).equals("") || finished)){
             finalDomain += domain;
         }
@@ -162,8 +160,6 @@ public class Dns {
         int max = cursor + dataLength*2;
 
         String answer = dnsData.substring(cursor, max);
-
-        // System.out.println("Answer : "+answer);
 
         // A
         if(type == 1){
@@ -195,23 +191,6 @@ public class Dns {
             return answer2.substring(0, answer2.length()-1);
         }
 
-        // while(cursor < max){
-
-        //     finished = false;
-
-        //     while(!((domain = readWord(""+dnsData.substring(cursor))).equals("") || finished)){
-        //         finalDomain += domain;
-        //         System.out.println("Final DOmain dans while : "+finalDomain);
-        //     }
-        //     if(finished){
-        //         finalDomain += domain;
-        //         System.out.println("Final DOmain dans if : "+finalDomain);
-
-        //     }
-        // }
-
-        // System.out.println("Final Domain Return : "+finalDomain);
-
         return finalDomain;
     }
 
@@ -229,67 +208,33 @@ public class Dns {
 
         // If we have an offset
         if(len.startsWith("11")){
-            // System.out.println("Data : "+data);
             pointer = Integer.parseInt( ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(data.substring(0, 4), 16)), 16).substring(2, 16), 2);
             int offset = pointer;
             pointer = pointer*2 - 24;
-            // System.out.println("Pointer : "+pointer);
-            // System.out.println("Len : "+ ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+2), 16)), 16));
-            // System.out.println("Dns Data at pointer : "+dnsData.substring(pointer, pointer+6));
+
             
             while((intlen = Integer.parseInt(ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+2), 16)), 16), 2)) != 0){
-                // if((intlen2 = ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(data.substring(pointer, pointer+4), 16)), 16)).startsWith("11")){
-                //     pointer2 = Integer.parseInt(ProtocolParser.addFlagsPadding(intlen2, 16).substring(2, 16), 2);
-                //     pointer2 = pointer2*2 - 24;
-                //     // while((intlen = Integer.parseInt(ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer2, pointer2+2), 16)), 16), 2)) != 0){
-                //     //     String domain = ProtocolParser.domainHexaToHuman(dnsData.substring(pointer2+2, pointer2+2+intlen*2));
-                //     //     System.out.println("Domain : "+domain);
-                //     //     word += domain + ".";
-                //     //     pointer2 += 2+intlen*2;
-                //     // }
-                // } else {
-                // System.out.println("intlen : "+intlen);
+
                 String domain = ProtocolParser.hexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
-                // System.out.println("Domain : "+domain);
                 word += domain + ".";
                 pointer += 2+intlen*2;
-                // System.out.println("Word in while : "+word);
-                // }
             }
 
-            // System.out.println("Word : "+word);
             offsetBank.put(offset, word.substring(0, word.length()-1));
             cursor += 2;
             finished = true;
 
         } else if((intlen = Integer.parseInt(data.substring(0, 2), 16)) != 0){
             // If we have a word
-            // System.out.println("intlen = "+intlen);
             String domain = ProtocolParser.hexaToAscii(dnsData.substring(cursor+2, cursor+2+intlen*2));
             word += domain + ".";
             cursor += 2+intlen*2;
         }
-        // System.out.println("Returned word : "+word);
-        // System.out.println("Finished : "+finished);
+
         return word;
     }
 
-    // public String[] readOneWord(String data, int offset){
-
-    //     String len = Integer.toBinaryString(Integer.parseInt(data.substring(0, 1), 16));
-    //     int intlen;
-
-    //     if(len.startsWith("11")){
-
-    //     } else {
-    //         while()
-    //     }
-
-
-    // }
-
     public String readNameWithOffsets(String data){
-        // System.out.println("Data in readNameOffsets : "+data);
 
         String len = Integer.toBinaryString(Integer.parseInt(data.substring(0, 1), 16));
         int pointer;
@@ -298,8 +243,6 @@ public class Dns {
 
         if(len.startsWith("11")){
 
-            // System.out.println("Data in readNameOffsets : "+data);
-
             // Pointer where data to read starts
             pointer = Integer.parseInt(ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(data.substring(0, 4), 16)), 16).substring(2, 16), 2);
             pointer = pointer*2 - 24;
@@ -307,23 +250,14 @@ public class Dns {
             // Getting len as integer
             len = Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+1), 16));
             intlen = Integer.parseInt(ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+2), 16)), 16), 2);
-            // System.out.println("intlen on : "+dnsData.substring(pointer, pointer+2));
-
-            // System.out.println("intlen : "+intlen);
-            // System.out.println("DOmain on : "+dnsData.substring(pointer+2, pointer+2+intlen*2));
 
             while(intlen != 0 && !len.startsWith("11")){
                 String domain = ProtocolParser.hexaToAscii(dnsData.substring(pointer+2, pointer+2+intlen*2));
-                // System.out.println("Domain : "+domain);
                 word += domain + ".";
                 pointer += 2+intlen*2;
 
                 len = Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+1), 16));
                 intlen = Integer.parseInt(ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(dnsData.substring(pointer, pointer+2), 16)), 16), 2);
-                // System.out.println("Len : "+len);
-                // System.out.println("intLen end while : "+intlen);
-                // System.out.println("Working on : "+dnsData.substring(pointer, pointer+2));
-
 
             }
             if(intlen == 0){
@@ -368,8 +302,6 @@ public class Dns {
             // Get name field
             query.setName(readDomain());
 
-            // System.out.println("Name : "+query.getName());
-
             // Get Type fields
             query.setType(Integer.parseInt(dnsData.substring(cursor+2, cursor+6), 16));
 
@@ -384,29 +316,15 @@ public class Dns {
         for(i=0 ; i < Integer.parseInt(answerRRs, 16); i++){
             DnsResponse answer = new DnsResponse();
 
-            // System.out.println("From cursor : "+dnsData.substring(cursor));
-
-
-
             int type = Integer.parseInt(dnsData.substring(cursor+4, cursor+8), 16);
-
-            // System.out.println("Type of answer "+(i+1)+": "+type);
 
             if(type == 1 || type == 2 || type == 15 || type == 28 || type == 5){
 
                 // Get name field
                 String name = readNameWithOffsets(dnsData.substring(cursor));
                 answer.setName(name.substring(0, name.length()-1));
-                // answer.setName(readDomain());
-                // cursor += 2;
-
-                // System.out.println("Domain queried : "+answer.getName());
-
-                // System.out.println("From cursor : "+dnsData.substring(cursor));
 
                 // Get Type fields
-                // System.out.println("Type : "+dnsData.substring(cursor, cursor+4));
-
                 answer.setType(Integer.parseInt(dnsData.substring(cursor, cursor+4), 16));
 
                 // Get Class field
@@ -416,19 +334,12 @@ public class Dns {
 
                 answer.setDataLength(Integer.parseInt(dnsData.substring(cursor+16, cursor+=20), 16));
 
-                // System.out.println("Data lenth : "+answer.getDataLength());
-
                 String domainAnswer = readDomainAnswer(answer.getDataLength(), type);
 
                 answer.setAddress(domainAnswer);
 
                 dnsResponses.add(answer);
 
-                // cursor += 2;
-
-                // System.out.println("Added answer : "+answer.getAddress());
-
-                // System.out.println("Cursor position : "+dnsData.substring(cursor));
             } else {
                 cursor += 4 + 4 + 4 + 8;
                 cursor += Integer.parseInt(dnsData.substring(cursor, cursor+4), 16)*2;

@@ -1,3 +1,4 @@
+package src;
 public enum FtpCommands {
 
     USER("USER ", "USER"), // <username> <CRLF>

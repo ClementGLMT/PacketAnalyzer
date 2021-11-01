@@ -1,3 +1,4 @@
+package src;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -5,7 +6,6 @@ public class HttpRequest {
 
     private String method;
     private String uri;
-    // private String version;
     private String httpPacket;
     private String httpHeaders;
     private boolean isMatched;
@@ -72,7 +72,6 @@ public class HttpRequest {
 
     public String toString(){
         return "HTTP Request : "+method+" on "+uri+headersToString();
-        // return "------HTTP------\nMethod : "+method+"\nURI : "+uri+headersToString();
     }
 
     

@@ -1,3 +1,4 @@
+package src;
 public class DhcpOption {
 
     private int optionCode;

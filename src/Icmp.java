@@ -1,3 +1,4 @@
+package src;
 public class Icmp {
 
     private int type;
@@ -39,10 +40,6 @@ public class Icmp {
     public String toString(){
         resolveHumans();
         return "ICMP "+typeHuman+(codeHuman.equals("No code") ? "" : "\nCode : "+codeHuman)+"\nPayload length: "+(payload.length()/2);
-
-        // return "------ICMP------\nType : "+typeHuman+(codeHuman.equals("No code") ? "" : "\nCode : "+codeHuman)+"\nPayload length: "+(payload.length()/2);
-
-        // return "------ICMP------\nType : "+type+" ("+typeHuman+")\nCode : "+code+" ("+codeHuman+")\nChecksum : "+checksum+"\nPayload : "+payload;
     }
 
     public void resolveHumans(){

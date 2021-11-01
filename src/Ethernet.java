@@ -1,3 +1,4 @@
+package src;
 public class Ethernet {
     private String destMacAddress;
     private String sourceMacAddress;
@@ -58,7 +59,6 @@ public class Ethernet {
 
     public String toString(){
         return "MAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
-        // return "------ETHERNET------\nMAC : "+sourceMacAddress+(sourceMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "") +" ----> "+destMacAddress + (destMacAddress.equals("ff:ff:ff:ff:ff:ff") ? " (Broadcast)" : "")/*+"\nEtherType : "+etherType+" ("+etherTypeHuman+")"*/;
     }
     
 }

@@ -1,3 +1,4 @@
+package src;
 public enum FtpResponseCodes {
 
 a100(100), 

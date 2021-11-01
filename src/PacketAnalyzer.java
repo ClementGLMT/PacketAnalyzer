@@ -1,3 +1,4 @@
+package src;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
@@ -41,9 +42,6 @@ public class PacketAnalyzer {
                 // Case IPv4 as Layer 3 protocol
                 case "IPv4":
 
-                    // if(isReassembled)
-                    //     currentPacket = packet.getIpv4().getPayload();
-
                     int ipv4headerLength = Integer.parseInt((String.valueOf(currentPacket.charAt(1))) , 16);
 
                     // Trying to recognize IPv4
@@ -66,11 +64,6 @@ public class PacketAnalyzer {
 
                         // We don't treat IP fragmentation case here
                         if(((ipv4.getMoreFragment() != 1) && (ipv4.getIntFragmentOffset() == 0)) || isReassembled){
-                            // System.out.println("Dont fragment : "+ipv4.getDontFragment());
-                            // System.out.println("More fragment : "+ipv4.getMoreFragment());
-                            // System.out.println("Offset : "+ipv4.getIntFragmentOffset());
-
-                            // System.out.println("Depiled packet : "+currentPacket);
 
                             // IPv4 Headers gives us the Layer 4 protocol used
                             switch (ipv4.resolveTransportProtocol()) {
@@ -114,7 +107,6 @@ public class PacketAnalyzer {
                                             httpC++;
 
                                             packet.addHttpRequest(httpRequest);
-                                            // System.out.println(httpRequest);
                                         }
 
                                         if(httpResponse.isMatched()){
@@ -122,7 +114,6 @@ public class PacketAnalyzer {
                                             httpC++;
                                             
                                             packet.addHttpResponse(httpResponse);
-                                            // System.out.println(httpResponse);
                                         }
 
                                         if(ftp.isMatched()){
@@ -138,17 +129,8 @@ public class PacketAnalyzer {
                                             packet.addFtp(ftp);
                                         }
 
-                                        // Trying to recognize DNS
+                                        // Trying to recognize DNS on port 53
                                         if(tcp.getDestinationPort() == 53 ||  tcp.getSourcePort() == 53){
-
-                                            // packetList.set(i, packetList.get(i).addDebug("Matched on : "+udp.getUdpData()));
-                                            // packetList.set(i, packetList.get(i).addDebug("Size : "+Integer.parseInt(m.group(1), 16)*2));
-                                            // packetList.set(i, packetList.get(i).addDebug("Length du bousin : "+m.group(2).length()));
-
-                                            // System.out.println("DNS matched");
-                                            // System.out.println("Size : "+Integer.parseInt(m.group(1), 16));
-                                            // System.out.println("Length du bousin : "+m.group(2).length());
-                                                // System.out.println("DNS matched and checked");
 
                                             if(!tcp.getPayload().equals("")){
                                                 Dns dns = ProtocolParser.recognizeDns(tcp.getPayload().substring(4));
@@ -157,7 +139,6 @@ public class PacketAnalyzer {
                                                     
                                                     dnsC++;
                                                     packet.addDns(dns);
-                                                    // System.out.println(dns); 
                                                 }
                                             }
                                         }
@@ -172,9 +153,6 @@ public class PacketAnalyzer {
                                     if(udp.isMatched()){
                                           
                                         udpC++;
-                                        // System.out.println(udp);
-                                        // System.out.println("UDP Headers : "+udp.getUdpHeaders());
-                                        // System.out.println("UDP Data : "+udp.getUdpData());
 
                                         packet.addUdp(udp);
 
@@ -199,29 +177,16 @@ public class PacketAnalyzer {
                                             
                                             httpC++;
                                              packet.addHttpRequest(httpRequest);
-                                            // System.out.println(httpRequest);
                                         }
 
                                         if(httpResponse.isMatched()){
 
                                             httpC++;
                                              packet.addHttpResponse(httpResponse);
-                                            // System.out.println(httpResponse);
                                         }
-
-                                        // System.out.println("UDP Data Ascii :\n"+currentPacketAscii);
 
                                         // Trying to recognize DNS
                                         if(udp.getDestPort() == 53 ||  udp.getSourcePort() == 53){
-
-                                                // packetList.set(i, packetList.get(i).addDebug("Matched on : "+udp.getUdpData()));
-                                                // packetList.set(i, packetList.get(i).addDebug("Size : "+Integer.parseInt(m.group(1), 16)*2));
-                                                // packetList.set(i, packetList.get(i).addDebug("Length du bousin : "+m.group(2).length()));
-
-                                                // System.out.println("DNS matched");
-                                                // System.out.println("Size : "+Integer.parseInt(m.group(1), 16));
-                                                // System.out.println("Length du bousin : "+m.group(2).length());
-                                                    // System.out.println("DNS matched and checked");
 
                                             Dns dns = ProtocolParser.recognizeDns(udp.getUdpData());
 
@@ -229,7 +194,6 @@ public class PacketAnalyzer {
                                                 
                                                 dnsC++;
                                                 packet.addDns(dns);
-                                                // System.out.println(dns); 
                                             }
                                         }
 
@@ -245,8 +209,6 @@ public class PacketAnalyzer {
 
                                         icmpC++;
                                         packet.addIcmp(icmp);
-
-                                        // System.out.println(icmp);
 
                                     }
 
@@ -277,10 +239,6 @@ public class PacketAnalyzer {
                         arpC++;
 
                         packet.addArp(arp);
-
-                        // Print ARP Information
-                        // System.out.println(arp);
-                        // System.out.println(arp.getArpData());
     
                         // No Decapsulation, no protocol over ARP @todo a verif quand meme
     
@@ -299,26 +257,18 @@ public class PacketAnalyzer {
     }
 
     private static Packet reassemblPacket(ArrayList<Packet> packets){
-        // ArrayList<Packet> packets = packetsTmp;
-        // int intialSize = packets.size();
         Packet reassembled = new Packet();
         int currentOffset = 0;
         int i=0;
         for (Packet p: packets){
             if(p.getIpv4().getFragmentOffsetBytes()*8 == 0 && p.getIpv4().getMoreFragment() == 1){
                 reassembled = new Packet(p);
-                // System.out.println("Packet 2655 Ipv4 payload après dans chelou 2: \n"+packetList.get(2654).getIpv4().getPayload());
 
-                // System.out.println("Initialized with payload :\n"+reassembled.getIpv4().getPayload());
                 currentOffset += p.getIpv4().getPayloadLength();
                 packets.remove(i);
             }
             i++;
         }
-
-
-        // System.out.println("Current offset after initialization : "+currentOffset);
-        // System.out.println("Initalized packet id : "+reassembled.getIpv4().getIdentification());
 
         // If the precedent if statement didn't match, currentOffset will be equal to 0
         // In this case, it's a coincidence that the 2 packets have the same ID
@@ -327,17 +277,13 @@ public class PacketAnalyzer {
             int todelete=0;
             while(packets.size() != 0){
                 for(Packet p: packets){
-                    // System.out.println("Offset testing : "+p.getIpv4().getFragmentOffsetBytes());
-                    // System.out.println("Packet id testing : "+p.getIpv4().getIdentification());
 
                     if(p.getIpv4().getFragmentOffsetBytes() == currentOffset){
 
                         reassembled.setPacketData(reassembled.getPacketData()+ p.getIpv4().getPayload());
 
                         reassembled.getIpv4().setPayload(reassembled.getIpv4().getPayload() + p.getIpv4().getPayload());
-                        // System.out.println("Packet 2655 Ipv4 payload dans appel chelou : \n"+packetList.get(2654).getIpv4().getPayload());
 
-                        // System.out.println("New reassembled payload :\n"+reassembled.getIpv4().getPayload());
                         currentOffset += p.getIpv4().getPayloadLength();
                         todelete = i;
                         break;
@@ -347,7 +293,6 @@ public class PacketAnalyzer {
                 packets.remove(todelete);
             }
         }
-        // System.out.println("Returning payload :\n"+reassembled.getIpv4().getPayload());
         return reassembled;
     }
 
@@ -432,15 +377,11 @@ public class PacketAnalyzer {
                 Packet packet = parsePacketProtocols(globalHeaders, packetList.get(packetCounter), false);
 
 
-                if(packet.getIpv4().isMatched() /*&& !packet.getIpv4().getIdentification().equals("0000")*/){
+                if(packet.getIpv4().isMatched()){
                     if(packetsById.putIfAbsent(packet.getIpv4().getIdentification(), new ArrayList<Packet>(Arrays.asList(new Packet[] {new Packet(packet)}))) != null){
 
-                        // System.out.println("Testing timestamps for packet "+(packetCounter+1));
                         int current = (Integer) packet.getPacketHeaders().get("ts_sec");
                         int fromHT = (Integer) packetsById.get(packet.getIpv4().getIdentification()).get(0).getPacketHeaders().get("ts_sec");
-                        // System.out.println("Current : "+current);
-                        // System.out.println("From hashtable : "+fromHT);
-                        // System.out.println("Equality test : "+ (current == fromHT));
 
                         // If the packet has the same timestamp, we consider that it's not a coincidence that the packets has the same IP id.
                         if(current == fromHT){
@@ -451,17 +392,12 @@ public class PacketAnalyzer {
                     }
                 }
 
-                // if(2653 <= packetCounter && packetCounter <= 2656)
-                    // System.out.println("Setting packet "+(packetCounter+1)+"\nIpv4 payload : "+packet.getIpv4().getPayload());
                 packetList.set(packetCounter, packet);
 
             }
         } else {
             System.out.println("Capture not from an Ethernet Data-Link capture, exiting");
         }
-
-        // System.out.println("Packet 2655 Ipv4 payload before reassembling : \n"+packetList.get(2654).getIpv4().getPayload());
-        // System.out.println("Packet 2656 Ipv4 payload before reassembling : \n"+packetList.get(2655).getIpv4().getPayload());
 
         int count = 1;
         for (Map.Entry<String, ArrayList<Packet>> e : packetsById.entrySet()){
@@ -493,9 +429,7 @@ public class PacketAnalyzer {
             if(parseFilter(arguments.get(1), packet) || parseFilter(arguments.get(1), rea)){
 
                 System.out.println("\n\n------------------------------------Packet "+packetCounter+"------------------------------------");
-                // System.out.println("IPv4 Payload of current : "+packet.getIpv4().getPayload());
                 ArrayList<Packet> frags = packetsById.get(packet.getIpv4().getIdentification());
-                // System.out.println("Frags size for id "+packet.getIpv4().getIdentification()+" : "+frags.size());
                 if(frags != null && frags.size() > 1){
                     System.out.println("\n------Fragmented IP Packet "+(fragmentedCursor+1)+" of "+frags.size()+"------");
                     fragmentedCursor++;
@@ -514,7 +448,6 @@ public class PacketAnalyzer {
                     packet.printDebug();
                 }
                 printCounter++;
-            // Afficher au bon moment le paquet réassemblé
             }
             packetCounter++;
         }

@@ -1,3 +1,4 @@
+package src;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -107,8 +108,7 @@ public class Dhcp {
         String optionsString = "";
         String dhcpMessageType = "\n";
         String descr = "";
-        // for (DhcpOption dhcpOption : options) {
-        // if(dhcpOption.getOptionCode() == 53){
+
         DhcpOption msgType = options.get(53);
         switch(Integer.parseInt(msgType.getOptionValue(), 16)){
             case 1:
@@ -127,29 +127,7 @@ public class Dhcp {
                 break;
             
         }
-        // }
-            // optionsString += dhcpOption.toString();
-        // }
-        // switch(options.)
         return descr;
-
-        // return "------DHCP------\nBoot Opcode : "+getOpCodeHuman()+descr;
-        // return "------DHCP------\nOpcode : "+opcode+" ("+getOpCodeHuman()+
-        // ")\nHardware type : "+htype+
-        // "\nHarware Len : "+hlen+
-        // "\nHops : "+hops+
-        // "\nTransaction ID : "+transacId+
-        // "\nSecond elapsed : "+secondElapsed+
-        // "\nFlags : "+flags+
-        // "\nBroadcast Flag : "+this.broadcastFlag+
-        // "\nClient IP : "+clientIp+
-        // "\nYour Client IP : "+yourClientIp+
-        // "\nNext Server IP : "+nextServerIp+
-        // "\nGateway IP : "+gatewayIp+
-        // "\nClient MAC : "+clientMac+
-        // "\nServer Hostname : "+serverHostName+
-        // "\nBoot File : "+bootFile+
-        // "\nOptions : "+optionsString;
     }
     
     

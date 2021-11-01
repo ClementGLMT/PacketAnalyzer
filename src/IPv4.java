@@ -1,3 +1,4 @@
+package src;
 public class IPv4 {
 
     private int headerLength;
@@ -29,11 +30,8 @@ public class IPv4 {
         this.totalLength = totalLength;
         this.identification = identification;
         this.flags = ProtocolParser.addFlagsPadding(Integer.toBinaryString(Integer.parseInt(flags, 16)), 16);
-        // System.out.println("Flagss : "+this.flags);
-        // System.out.println("offset given : "+fragmentOffset);
 
         this.resolveFlags(this.flags);
-        // this.fragmentOffset += fragmentOffset;
 
         this.ttl = ttl;
         this.protocol = protocol;
@@ -88,8 +86,6 @@ public class IPv4 {
 
     public String toString(){
         return "IPv4 : "+sourceAdress+" ----> "+destinationAdress;
-        // return "------IPv4------\nTransport protocol : "+resolveTransportProtocol()+" ("+protocol+")\n\nIP : "+sourceAdress+" ---> "+destinationAdress;
-        // return "------IPv4------\nHeader Length : "+headerLength+" ("+headerLengthBytes+" bytes)\nDS : "+ds+"\nTotal Length : "+totalLength+"\nIdentification : "+identification+"\nFlags : "+flags+"\nFragment Offset : "+intFragmentOffset+"\nFragmentOffset String : "+fragmentOffset+"\nTTL : "+ttl+"\nProtocol : "+protocol+" ("+resolveTransportProtocol()+")\nHeader Checksum : "+headerChecksum+"\nSource @ : "+sourceAdress+"\nDestination @ : "+destinationAdress+"\nOptions : "+options;
     }
 
     public boolean isMatched(){
@@ -127,8 +123,6 @@ public class IPv4 {
     }
 
     public void setPayload(String payload){
-        // System.out.println("Setting payload to :\n"+payload);
-        // Thread.dumpStack();
         this.payload = payload;
     }
 
