@@ -113,7 +113,9 @@ public class Dns {
     }
 
     public String getQuestions(){
-        String r="\n\nQUESTIONS : ";
+        String r="";
+        if(dnsQueries.size() > 0)
+            r+="\n\nQUESTIONS : ";
         for (int i=0; i < dnsQueries.size(); i++) {
             r += "\nQuestion "+(i+1)+"\n\tName : "+dnsQueries.get(i).getName()+"\n\tType : "+dnsQueries.get(i).getTypeHuman()+"\n\tClass : "+dnsQueries.get(i).getDnsClassHuman();
         }
@@ -121,7 +123,9 @@ public class Dns {
     }
 
     public String getAnswers(){
-        String r="\n\nANSWERS : ";
+        String r="";
+        if(dnsResponses.size() > 0)
+            r+="\n\nANSWERS : ";
         for(int i=0; i < dnsResponses.size(); i++){
             r += "\nAnswer "+(i+1)+"\n\tName : "+dnsResponses.get(i).getName()+"\n\tType : "+dnsResponses.get(i).getTypeHuman()+"\n\tClass : "+dnsResponses.get(i).getDnsClassHuman()+/*"\n\tTTL : "+dnsResponses.get(i).getTtl()+"\n\tResponse Length : "+dnsResponses.get(i).getDataLength()+*/"\n\tResponse : "+dnsResponses.get(i).getAddress();
         }
