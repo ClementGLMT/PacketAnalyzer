@@ -16,7 +16,7 @@ L'affichage sera différent selon les protocoles qui ont pu y être reconnus. On
 ### <b>PcapReader.java</b>
 </br>
 Cette classe se construit avec un nom de fichier.</br>
-Deux méthodes servent de récupérer les données depuis le fichier :
+Deux méthodes servent à récupérer les données depuis le fichier :
 
 ```
 PcapReader.getFileHeaders() // Retourne une Hashtable contenant les headers du fichier au format Key/Value
@@ -28,10 +28,10 @@ PcapReader.getPacketList() // Retourne la liste d'objets Packets qui a pu être 
 
 ### <b>ProtocolParser.java</b>
 </br>
-Cette classe contient toutes les méthodes permettant de reconnaître des protocoles.</br> Pour chaque protocole <\proto>, une méthode correspondante est définie comme suit : 
+Cette classe contient toutes les méthodes permettant de reconnaître des protocoles.</br> Pour chaque protocole PROTO , une méthode correspondante est définie comme suit : 
 
 ```
-ProtocolParser.recognize<proto>() // Retourne un objet de type <proto> contenant les informations du protocole <proto> si il a été reconnu, sinon un objet vide <proto>
+ProtocolParser.recognize<PROTO>() // Retourne un objet de type <PROTO> contenant les informations du protocole <PROTO> si il a été reconnu, sinon un objet vide <PROTO>
 ```
 Cette classe statique contient également des fonctions utiles au traitement des paquets, notamment pour la gestion des flags et le traitement de l'hexadécimal du fichier.</br>
 La reconnaissance des protocoles ainsi que la récupérations de leurs données quand ils sont reconnus se fait grâce à des expressions régulières.
@@ -77,7 +77,7 @@ Suite à l'affichage des paquets, un résumé est affiché, synthétisant le nom
 </br></br>
 
 ## Protocoles traités
-Etant donné que tous les traitements réalisées sont fait du des chaînes de caractères récupérés depuis le fichier, j'entends par "Caractère" ou "Valeurs" hexadécimales 1 caractère de la chaîne de caractère traitée. En réalité, chaque octet est représenté par 2 caractères dans la chaîne de caractères traitée.
+Etant donné que tous les traitements réalisées sont fait du des chaînes de caractères récupérés depuis le fichier, j'entends par "Caractère" hexadécimal 1 caractère de la chaîne de caractère traitée. En réalité, chaque octet du paquet est représenté par 2 caractères dans la chaîne de caractères traitée.
 ### Ethernet
 </br>
 La reconnaissance d'Ethernet se fait grâce à une expression régulière matchant :
@@ -193,3 +193,135 @@ Voici un exemple d'affichage d'UDP :
 </br></br>
 <img title="Screen_udp" src="src_readme/udp.png">
 </br></br>
+
+### DNS
+</br>
+La reconnaissance du DNS se réalise en deux étapes. Une première expression régulière est chargée de reconnaître le protocole, la seconde de récupérer les informations relatives au DNS lorsque qu'il a été reconnu.</br>
+La première expression régulière va passer 24 caractères hexadécimaux des données applicatives (payload TCP ou UDP). Ces 24 caractères correspondent à la partie fixe du header DNS (Transaction ID, Flags, Questions, Answers RRs, Authority RRs, Additional RRs). L'expression régulière va ensuite récupérer les 2 caractères hexadécimaux suivants (qui correspondent à la taille en octets du 1er "mot" de la 1ère question du paquet) puis un "mot", composé uniquement de valeurs hexadécimales codant les valeurs autorisées dans un nom de domaine (lettres minuscules et majuscules, tiret "-") conformément à la RFC 1035.</br>
+Une vérification est ensuite faite, pour être sûr que le mot récupéré est bien de la taille récupérée, conformément à la RFC 1035. Etant donné que plusieurs protocoles partagent un format de paquet extrêmement similaire (notamment MDNS), un filtre est rajouté sur le port 53 pour être convaincu que le protocole est bien du DNS.</br>
+Une fois cette vérification faite, on applique une 2e expression régulière pour récupérer les headers : 
+<ul>
+<li>[Capturé] Transaction ID : 4 caractères hexadécimaux</li>
+<li>[Capturé] Flags : 4 caractères hexadécimaux</li>
+<li>[Capturé] Questions : 4 caractères hexadécimaux</li>
+<li>[Capturé] Answers RRs : 4 caractères hexadécimaux</li>
+<li>[Capturé] Authority RRs : 4 caractères hexadécimaux</li>
+<li>[Capturé] Additionnal RRs : 4 caractères hexadécimaux</li>
+</ul>
+Une fois ces headers récupérés, on va utiliser les compteurs fournis pour boucler et récupérer autant de questions et de réponses qu'il y en a d'annoncées. Cette récupération gère la compression définie dans la RFC 1035.<br>
+Les types de requêtes traitées sont A, AAAA, CNAME, MX, NS.</br>
+Voici un exemple d'affichage de paquet DNS :
+</br></br>
+<img title="Screen_dns" src="src_readme/dns.png">
+</br></br>
+
+### FTP
+</br>
+Pour reconnaître le FTP, 2 expressions régulières sont construites afin de reconnaître les 2 types de message FTP : les commandes et les réponses. Pour cela, l'hexadécimal est converti en ASCII.</br>
+Pour reconnaître les commandes, une expession régulière est construite grâce à l'énumération `FtpCommands` pour pouvoir matcher toutes les commandes ainsi qu'un argument optionnel, défini par des caractères ASCII affichables, suivis de "\r\n" pour terminer le message. Ces informations ont été récupérées depuis la RFC 959. Elle est construite comme suit : 
+<ul>
+<li>[Capturé] Commande : Une des commandes définies dans la RFC 959</li>
+<li>[Capturé] [Optionnel] Argument : Une suite de caractères ASCII affichables</li>
+<li>"\r\n" : Descripteur de fin de message</li>
+</ul>
+L'expression régulière pour reconnaître les réponses a une construction similaire. L'entièreté des codes de réponse sont récupérés dans l'énumération `FtpResponseCodes`. De la même manière que pour les commandes, on récupère également l'argument sous la forme d'une suite de caractères affichables ASCII suivis de "\r\n". Sa construction est la suivante : 
+<ul>
+<li>[Capturé] Response Code : Un des codes de réponse spécifié dans la RFC 959</li>
+<li>[Capturé] Argument : Une suite de caractères ASCII affichables</li>
+<li>"\r\n" : Descripteur de fin de message</li>
+</ul>
+Si on détecte la commande PASV, c'est à dire une demande au serveur de basculer en mode passif, on note les informations transmises par le serveur : IP du mode passif et port d'écoute. Ces informations serviront à reconnaître le protocole FTP-DATA.</br>
+Exemple d'échange FTP :
+</br></br>
+<img title="Screen_ftp" src="src_readme/ftp.png">
+</br></br>
+
+### DHCP
+</br>
+Pour reconnaître et capturer le protocole DHCP, une expression régulière est utilisée. Plusieurs valeurs fixes sont utilisées avec de le repérer avec certitude. Voici la construction de l'expression régulière : 
+<ul>
+<li>Premier caractère hexadécimal du message Type : Toujours 0, car seulement 2 Message type sont spécifiés dans la RFC 2131 : 01 et 02</li>
+<li>[Capturé] Deuxième caractère hexadécimal du message Type : Soit 1 soit 2</li>
+<li>Harware Type : 01 pour Ethernet dans notre cas</li>
+<li>[Capturé] Harware Address length : 2 caractères hexadécimaux</li>
+<li>[Capturé] Hops : 2 caractères hexadécimaux</li>
+<li>[Capturé] Transaction ID : 8 caractères hexadécimaux</li>
+<li>[Capturé] Second elapsed : 4 caractères hexadécimaux</li>
+<li>[Capturé] BootP flags : 4 caractères hexadécimaux</li>
+<li>[Capturé] Client IP address : 8 caractères hexadécimaux</li>
+<li>[Capturé] Your Client IP address : 8 caractères hexadécimaux</li>
+<li>[Capturé] Next server IP address : 8 caractères hexadécimaux</li>
+<li>[Capturé] Relay agent IP address : 8 caractères hexadécimaux</li>
+<li>[Capturé] Client MAC address + padding: 32 caractères hexadécimaux</li>
+<li>[Capturé] Server host name: 128 caractères hexadécimaux</li>
+<li>[Capturé] Boot file name: 256 caractères hexadécimaux</li>
+<li>DHCP Magic Cookie : Valeur fixe, donnée dans la RFC 2131</li>
+<li>[Capturé] Options : Suite de caractères hexadécimaux de taille variable</li>
+</ul>
+Le DHCP magic cookie permet d'identifier avec une quasi certitude ce protocole. Pour totalement écarter le risque de coïncidence, d'autres valeurs fixes sont ajoutées dans l'expression régulière (1er caractère hexadécimal du Message Type et Hardware Type)</br>
+Les options sont récupérées et ajoutées dans une Hashtable. Etant donné leur nombre, elles ne sont pas toutes bien formattées pour l'affichage. Seules les plus courantes sont affichées. Un affichage conditionnel est réalisé en fonction des différents options présentes.</br>
+Seules les informations importantes pour la compréhension du paquet sont affichées. Voici un exemple d'échange DHCP :
+</br></br>
+<img title="Screen_dhcp" src="src_readme/dhcp.png">
+</br></br>
+
+### HTTP
+</br>
+Pour reconnaître le protocole HTTP, on essaye de reconnaître séparément les requêtes des réponses.</br>
+Pour les requêtes, sur la chaine hexadécimale convertie en ASCII, on essaye d'abord de matcher les versions 0.9 et 1.0 d'HTTP :
+<ul>
+<li>[Capturé] Une des méthodes spécifiée dans la RFC 1945</li>
+<li>[Capturé] Une URL ou une URI</li>
+<li>Les mots "HTTP/0.9" ou "HTTP/1.0"</li>
+</ul>
+Si l'expression régulière n'es pas matchée, on essaye de reconnaître le protocole HTTP 1.1. L'expression régulière est la même, sauf qu'on ajoute la présence du header "Host", qui est obligatoire en HTTP/1.1 selon la RFC 2616. Une fois reconnu, toutes les données sont traitées pour séparer les headers des données quand elles sont présentes</br>
+Pour reconnaître les réponses HTTP, on reconnaît :
+<ul>
+<li>Les mots "HTTP/" suivis de la version</li>
+<li>[Capturé]3 chiffres représentant le code de réponse</li>
+<li>[Capturé]Des caractères affichables ASCII représentant la raison</li>
+<li>Les caractères "\r\n"</li>
+</ul>
+Le reste des données est ensuite traité pour récupérer les headers et les données, qui sont stockés dans des objets propres.
+Voici un exemple de requête HTTP :
+</br></br>
+<img title="Screen_http" src="src_readme/http.png">
+</br></br>
+
+### Gestion de la fragmentation IP
+</br>
+La fragmentation IP est gérée de la manière suivante : on regarde si deux paquets ont le même ID, et si c'est le cas, on regarde si ils ont le même timestamp. Si c'est le cas, on considère que ces deux paquets sont bien fragmentés et font partie du même paquet. Le traitement par le timestamp a été rajouté pour pallier au cas où deux paquets avaient le même ID par pure coïncidence. Etant donné que les paquets sont envoyés à la suite, les timestamp sont toujours égaux pour 2 fragments dans les captures en ma possession.</br>
+Une fois réassemblé, le paquet final est affiché à la suite des paquets fragmentés.</br></br>
+
+
+## Utilisation du programme
+</br>
+Depuis le répertoire PacketAnalyzer :</br>
+
+```
+clear && javac src/*.java && java src/PacketAnalyzer captures/<file>.pcap <proto>
+```
+Où \<file> est le fichier à analyser et \<proto> le protocole à filtrer. \<proto> peut prendre les valeurs suivantes : 
+<ul>
+<li>eth</li>
+<li>arp</li>
+<li>ip</li>
+<li>tcp</li>
+<li>udp</li>
+<li>icmp</li>
+<li>dhcp</li>
+<li>ftp</li>
+<li>dns</li>
+<li>http</li>
+</ul>
+Si aucun filtre n'est donné, aucun filtre ne sera appliqué et tous les paquets seront affichés.
+
+## Fichiers Pcap
+
+dns_cap.pcap : fragmentation, DNS, DHCP</br>
+ftp.pcap : FTP</br>
+dhcp.pcap, dhcp_renew.pcap : DHCP</br>
+tcp.pcap : TCP, DNS, HTTP, ARP</br>
+arp.pcap : ARP
+icmp_tcp_udp.pcap : ICMP</br>
+Tous : Ethernet, IPv4

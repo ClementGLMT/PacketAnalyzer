@@ -113,17 +113,17 @@ public class Dns {
     }
 
     public String getQuestions(){
-        String r="";
+        String r="\n\nQUESTIONS : ";
         for (int i=0; i < dnsQueries.size(); i++) {
-            r += "\n\nQUESTIONS : \nQuestion "+(i+1)+"\n\tName : "+dnsQueries.get(i).getName()+"\n\tType : "+dnsQueries.get(i).getTypeHuman()+"\n\tClass : "+dnsQueries.get(i).getDnsClassHuman();
+            r += "\nQuestion "+(i+1)+"\n\tName : "+dnsQueries.get(i).getName()+"\n\tType : "+dnsQueries.get(i).getTypeHuman()+"\n\tClass : "+dnsQueries.get(i).getDnsClassHuman();
         }
         return r;
     }
 
     public String getAnswers(){
-        String r="";
+        String r="\n\nANSWERS : ";
         for(int i=0; i < dnsResponses.size(); i++){
-            r += "\n\nANSWERS : \nAnswer "+(i+1)+"\n\tName : "+dnsResponses.get(i).getName()+"\n\tType : "+dnsResponses.get(i).getTypeHuman()+"\n\tClass : "+dnsResponses.get(i).getDnsClassHuman()+"\n\tTTL : "+dnsResponses.get(i).getTtl()+"\n\tResponse Length : "+dnsResponses.get(i).getDataLength()+"\n\tResponse : "+dnsResponses.get(i).getAddress();
+            r += "\nAnswer "+(i+1)+"\n\tName : "+dnsResponses.get(i).getName()+"\n\tType : "+dnsResponses.get(i).getTypeHuman()+"\n\tClass : "+dnsResponses.get(i).getDnsClassHuman()+/*"\n\tTTL : "+dnsResponses.get(i).getTtl()+"\n\tResponse Length : "+dnsResponses.get(i).getDataLength()+*/"\n\tResponse : "+dnsResponses.get(i).getAddress();
         }
         return r;
     }
